@@ -656,6 +656,7 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
   const lastAnswer = game.board_state?.last_answer;
 
   const [isChoosingGuess, setIsChoosingGuess] = useState(false);
+  const [freeQuestion, setFreeQuestion] = useState('');
 
   const toggleEliminate = (name) => {
     if (isChoosingGuess) {
@@ -848,31 +849,47 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
                 {q.label}
               </button>
             ))}
+            <div style={{ gridColumn: 'span 2', display: 'flex', gap: '4px', marginTop: '4px' }}>
+              <input
+                type="text"
+                className="input-child-mini"
+                placeholder="Pergunta livre..."
+                value={freeQuestion}
+                onChange={e => setFreeQuestion(e.target.value)}
+                onKeyPress={e => e.key === 'Enter' && freeQuestion.trim() && handleAsk({ attribute: 'custom', value: freeQuestion, label: `❓ ${freeQuestion}` })}
+              />
+              <button
+                onClick={() => freeQuestion.trim() && handleAsk({ attribute: 'custom', value: freeQuestion, label: `❓ ${freeQuestion}` })}
+                className="btn-puffy btn-blue"
+                style={{ width: '44px', height: '36px', padding: 0 }}
+              >🚀</button>
+            </div>
+          </div>
           </div>
         )}
 
-        {isChoosingGuess ? (
-          <button className="btn-puffy btn-light" onClick={() => setIsChoosingGuess(false)}>CANCELAR ↩️</button>
-        ) : (
-          <button
-            className="btn-puffy btn-purple"
-            disabled={!myTurn || waitingForAnswer}
-            style={{ opacity: (!myTurn || waitingForAnswer) ? 0.5 : 1, width: '100%' }}
-            onClick={() => setIsChoosingGuess(true)}
-          >
-            👉 ACHO QUE É...
-          </button>
-        )}
+      {isChoosingGuess ? (
+        <button className="btn-puffy btn-light" onClick={() => setIsChoosingGuess(false)}>CANCELAR ↩️</button>
+      ) : (
+        <button
+          className="btn-puffy btn-purple"
+          disabled={!myTurn || waitingForAnswer}
+          style={{ opacity: (!myTurn || waitingForAnswer) ? 0.5 : 1, width: '100%' }}
+          onClick={() => setIsChoosingGuess(true)}
+        >
+          👉 ACHO QUE É...
+        </button>
+      )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
-          <button onClick={() => {
-            const key = isP1 ? 'p1_eliminated' : 'p2_eliminated';
-            updateGame(game.id, { board_state: { ...game.board_state, [key]: [] } });
-          }} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#94a3b8' }}>RESETAR 🔄</button>
-          <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#f43f5e' }}>SAIR 🚪</button>
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
+        <button onClick={() => {
+          const key = isP1 ? 'p1_eliminated' : 'p2_eliminated';
+          updateGame(game.id, { board_state: { ...game.board_state, [key]: [] } });
+        }} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#94a3b8' }}>RESETAR 🔄</button>
+        <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#f43f5e' }}>SAIR 🚪</button>
       </div>
     </div>
+    </div >
   );
 };
 

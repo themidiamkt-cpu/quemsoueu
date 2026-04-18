@@ -302,6 +302,25 @@
   animation: pulse-soft 2s infinite ease-in-out;
 }
 
+.input-child-mini {
+  flex: 1;
+  height: 36px;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0 12px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--primary);
+  outline: none;
+  transition: all 0.3s;
+}
+
+.input-child-mini:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-light);
+}
+
 /* --- CARA A CARA META (Guess Who Style) --- */
 .face-grid-meta {
   display: grid;
@@ -320,19 +339,19 @@
 }
 
 .face-card-meta {
-  aspect-ratio: 1 / 1.3;
+  aspect-ratio: 1 / 1.1;
   background: white;
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  border: 4px solid white;
+  border: 2px solid white;
   position: relative;
-  padding: 12px;
+  padding: 6px;
 }
 
 .face-card-meta.eliminated {
@@ -344,16 +363,17 @@
 }
 
 .face-avatar {
-  font-size: 3rem;
-  margin-bottom: 8px;
+  font-size: 2.2rem;
+  margin-bottom: 2px;
 }
 
 .face-name {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   font-weight: 900;
   text-transform: uppercase;
   color: #475569;
   text-align: center;
+  line-height: 1;
 }
 
 /* Suggestions & Highlights */
@@ -418,17 +438,17 @@
 
 .quick-btn-meta {
   background: white;
-  border: 2px solid #e2e8f0;
-  padding: 12px 6px;
-  border-radius: 15px;
-  font-size: 0.75rem;
+  border: 1.5px solid #e2e8f0;
+  padding: 6px 4px;
+  border-radius: 12px;
+  font-size: 0.65rem;
   font-weight: 900;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
 }
 
 .quick-btn-meta:hover {
@@ -439,23 +459,23 @@
 
 .answer-box-meta {
   background: white;
-  border-radius: 20px;
-  padding: 20px;
+  border-radius: 16px;
+  padding: 12px;
   text-align: center;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-  border: 3px solid var(--primary-light);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 2px solid var(--primary-light);
   width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .secret-card-meta {
   background: var(--primary-light);
-  border-radius: 20px;
-  padding: 15px;
+  border-radius: 16px;
+  padding: 8px 12px;
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 12px;
+  margin-bottom: 8px;
   width: 100%;
   max-width: 500px;
   border: 2px solid white;
@@ -475,8 +495,8 @@
 .question-panel-meta {
   width: 100%;
   max-width: 500px;
-  margin-top: 16px;
+  margin-top: 8px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
 }
