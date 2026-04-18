@@ -553,9 +553,9 @@ const CaraACaraSetup = ({ game, user, exitRoom }) => {
 
   const handleStart = async () => {
     try {
-      // Pick 12 random characters from the rich set
+      // Pick 24 characters (max available)
       const shuffled = [...faceCharacters].sort(() => 0.5 - Math.random());
-      const selected = shuffled.slice(0, 12);
+      const selected = shuffled.slice(0, 24);
 
       const p1Secret = selected[Math.floor(Math.random() * selected.length)];
       const p2Secret = selected[Math.floor(Math.random() * selected.length)];
