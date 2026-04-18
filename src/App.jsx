@@ -885,6 +885,7 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
             const key = isP1 ? 'p1_eliminated' : 'p2_eliminated';
             updateGame(game.id, { board_state: { ...game.board_state, [key]: [] } });
           }} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#94a3b8' }}>RESETAR 🔄</button>
+          <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#f43f5e' }}>SAIR 🚪</button>
         </div>
       </div>
     </div>
