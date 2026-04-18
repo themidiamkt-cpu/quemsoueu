@@ -60,6 +60,28 @@ const SlotMachine = ({ target, categoryId, onFinish }) => {
   );
 };
 
+const ScoreBoard = ({ game, isP1 }) => {
+  const scores = game.scores || { p1: 0, p2: 0 };
+
+  return (
+    <div className="flex justify-center gap-3 mb-6 relative z-10 w-full px-2">
+      <div className="bg-white flex-1 py-3 px-2 rounded-2xl shadow-puffy border-2 border-primary/10 flex flex-col items-center justify-center min-w-0">
+        <span className="text-[10px] font-black text-black opacity-30 uppercase truncate w-full text-center">
+          {isP1 ? (game.player1_name || 'VOCÊ') : (game.player2_name || 'VOCÊ')}
+        </span>
+        <span className="text-2xl font-black text-primary leading-none mt-1">{isP1 ? scores.p1 : scores.p2}</span>
+      </div>
+
+      <div className="bg-white flex-1 py-3 px-2 rounded-2xl shadow-puffy border-2 border-secondary/10 flex flex-col items-center justify-center min-w-0">
+        <span className="text-2xl font-black text-secondary leading-none">{isP1 ? scores.p2 : scores.p1}</span>
+        <span className="text-[10px] font-black text-black opacity-30 uppercase truncate w-full text-center mt-1">
+          {isP1 ? (game.player2_name || 'AMIGO') : (game.player1_name || 'AMIGO')}
+        </span>
+      </div>
+    </div>
+  );
+};
+
 export default function App() {
   const { user, game, loading, createRoom, joinRoom, exitRoom, subscribeToGame, updateGame, fetchGame } = useGame();
 
@@ -183,7 +205,17 @@ export default function App() {
               value={playerName}
               onChange={e => setPlayerName(e.target.value)}
             />
-            <button onClick={() => createRoom(playerName)} className="btn-puffy btn-purple text-white">
+            <button
+              onClick={async () => {
+                try {
+                  await createRoom(playerName);
+                } catch (err) {
+                  alert("Erro ao criar sala. Verifique se o banco de dados está atualizado! ❌");
+                  console.error(err);
+                }
+              }}
+              className="btn-puffy btn-purple text-white"
+            >
               <Users size={28} /> CRIAR SALA
             </button>
           </div>
@@ -204,7 +236,14 @@ export default function App() {
               onChange={e => setRoomCode(e.target.value.toUpperCase())}
             />
             <button
-              onClick={() => roomCode && joinRoom(roomCode, playerName)}
+              onClick={async () => {
+                try {
+                  if (roomCode) await joinRoom(roomCode, playerName);
+                } catch (err) {
+                  alert(err.message || "Erro ao entrar na sala. ❌");
+                  console.error(err);
+                }
+              }}
               className={`btn-puffy btn-green text-white transition-opacity ${!roomCode ? 'opacity-50' : ''}`}
             >
               <Play size={28} /> ENTRAR
@@ -229,6 +268,8 @@ export default function App() {
     return (
       <div className="child-container">
         <FloatingDecor />
+        <ScoreBoard game={game} isP1={isP1} />
+
         <div className="flex justify-between items-center mb-6 relative z-10">
           <h2 className="text-xl font-black text-black">🎯 Seu personagem</h2>
           <div className="text-right">
@@ -300,6 +341,12 @@ export default function App() {
                   <button onClick={modoAleatorio} className="btn-puffy btn-purple text-white text-xs">
                     🔥 MODO ALEATÓRIO TOTAL
                   </button>
+
+                  <div className="pt-4 border-t border-slate-50 mt-4">
+                    <button onClick={exitRoom} className="text-[10px] font-black text-rose-500 opacity-60 hover:opacity-100 uppercase tracking-widest transition-opacity">
+                      Sair da Sala 🚪
+                    </button>
+                  </div>
                 </div>
               )}
             </>
@@ -318,27 +365,11 @@ export default function App() {
   const renderPlaying = () => {
     const isP1 = game.player1_id === user.id;
     const opponentChar = isP1 ? game.player2_character : game.player1_character;
-    const scores = game.scores || { p1: 0, p2: 0 };
 
     return (
       <div className="child-container">
         <FloatingDecor />
-
-        {/* Placar */}
-        <div className="flex justify-center gap-4 mb-4 relative z-10 w-full px-4 text-center">
-          <div className="bg-white flex-1 py-2 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center">
-            <span className="text-[9px] font-black opacity-30 uppercase truncate w-full px-2">
-              {isP1 ? (game.player1_name || 'VOCÊ') : (game.player2_name || 'VOCÊ')}
-            </span>
-            <span className="text-xl font-black text-primary">{isP1 ? scores.p1 : scores.p2}</span>
-          </div>
-          <div className="bg-white flex-1 py-2 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center">
-            <span className="text-xl font-black text-secondary">{isP1 ? scores.p2 : scores.p1}</span>
-            <span className="text-[9px] font-black opacity-30 uppercase truncate w-full px-2">
-              {isP1 ? (game.player2_name || 'AMIGO') : (game.player1_name || 'AMIGO')}
-            </span>
-          </div>
-        </div>
+        <ScoreBoard game={game} isP1={isP1} />
 
         <div className="text-center mb-6 relative z-10">
           <span className="badge bg-primary text-white">🎮 SEU AMIGO É...</span>

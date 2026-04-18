@@ -16,6 +16,7 @@
   --radius-lg: 32px;
   --radius-md: 24px;
   --shadow-cartoon: 0 8px 0 rgba(0, 0, 0, 0.05);
+  --shadow-puffy: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
 }
 
 * {
@@ -196,6 +197,10 @@ body {
 .input-child:focus {
   border-color: var(--accent);
   background: white;
+}
+
+.shadow-puffy {
+  box-shadow: var(--shadow-puffy);
 }
 
 /* Utilities */
