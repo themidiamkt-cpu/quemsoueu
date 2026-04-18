@@ -20,7 +20,7 @@ export function useGame() {
         return () => subscription.unsubscribe();
     }, []);
 
-    const createRoom = async (p1Name) => {
+    const createRoom = async (p1Name, gameType = 'guess') => {
         if (!user) return;
 
         // Generate a simple 6-char code
@@ -34,8 +34,10 @@ export function useGame() {
                     player1_name: p1Name || 'Jogador 1',
                     player2_id: null, // Open for anyone with the code
                     room_code: code,
+                    game_type: gameType,
                     status: 'setup',
-                    scores: { p1: 0, p2: 0 }
+                    scores: { p1: 0, p2: 0 },
+                    board_state: {}
                 }
             ])
             .select()

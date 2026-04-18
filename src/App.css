@@ -1,7 +1,296 @@
-/* Reset default Vite styles */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap');
+
+:root {
+  --primary: #8b5cf6;
+  --primary-light: #ede9fe;
+  --secondary: #fb7185;
+  --secondary-light: #fff1f2;
+  --accent: #ffb100;
+  --mint: #34d399;
+  --mint-light: #ecfdf5;
+  --bg-gradient: linear-gradient(135deg, #f5f3ff 0%, #fff1f2 100%);
+  --radius-xl: 40px;
+  --radius-lg: 32px;
+  --radius-md: 20px;
+}
+
 #root {
   width: 100%;
   margin: 0;
   padding: 0;
-  text-align: left;
+  font-family: 'Nunito', sans-serif;
+}
+
+.child-container {
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px;
+  background: var(--bg-gradient);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Background Pattern */
+.child-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(var(--primary-light) 2px, transparent 2px);
+  background-size: 32px 32px;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* --- MEMORY GRID --- */
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  perspective: 1200px;
+}
+
+@media (max-width: 400px) {
+  .memory-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+}
+
+/* --- CARD 3D --- */
+.memory-card {
+  aspect-ratio: 100 / 130;
+  position: relative;
+  cursor: pointer;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+
+.memory-card.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid white;
+}
+
+/* Face Down */
+.card-front {
+  background: var(--primary);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.2) 2px, transparent 2px);
+  background-size: 16px 16px;
+}
+
+.card-front-icon {
+  color: white;
+  opacity: 0.5;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Face Up */
+.card-back {
+  background: white;
+  transform: rotateY(180deg);
+  padding: 8px;
+}
+
+.card-back.matched {
+  background: var(--mint-light);
+  border-color: var(--mint);
+  opacity: 0.8;
+}
+
+.card-emoji {
+  font-size: 2.5rem;
+  margin-bottom: 2px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.card-name {
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #64748b;
+  text-align: center;
+  max-width: 100%;
+  overflow: wrap;
+  word-break: break-word;
+  line-height: 1.1;
+  padding: 0 4px;
+}
+
+.match-check {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--mint);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+/* --- HUD & TIMER --- */
+.timer-container {
+  width: 100%;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  margin: 16px 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.timer-progress {
+  height: 100%;
+  background: var(--secondary);
+  border-radius: 10px;
+  transition: width 0.1s linear;
+}
+
+.turn-badge {
+  padding: 8px 24px;
+  border-radius: 100px;
+  font-weight: 900;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  transition: all 0.3s;
+}
+
+.turn-badge.active {
+  background: var(--primary);
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+}
+
+.turn-badge.waiting {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+
+/* --- LOBBY & SETUP --- */
+.room-code-box {
+  background: var(--primary-light);
+  border: 3px dashed var(--primary);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin: 20px 0;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.room-code-box:hover {
+  transform: scale(1.02);
+}
+
+.copy-hint {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 0.5rem;
+  font-weight: 900;
+  color: var(--primary);
+  opacity: 0.5;
+}
+
+.category-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.cat-btn {
+  background: white;
+  border: 3px solid #f1f5f9;
+  border-radius: var(--radius-md);
+  padding: 20px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cat-btn.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+/* --- PROGRESS BAR --- */
+.overall-progress {
+  width: 100%;
+  max-width: 300px;
+  text-align: center;
+  margin-top: 32px;
+}
+
+.progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  margin-top: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--mint);
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+
+/* REUSING HUD CARD FROM INDEX.CSS WITH OVERRIDES */
+.hud-card {
+  margin-bottom: 12px !important;
+}
+
+@keyframes pulse-soft {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+.pulse {
+  animation: pulse-soft 2s infinite ease-in-out;
 }

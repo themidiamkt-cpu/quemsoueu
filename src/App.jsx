@@ -15,6 +15,7 @@ import { supabase } from './lib/supabase';
 import { useGame } from './hooks/useGame';
 import { categories, characterBank } from './data/characters';
 import LoginScreen from './screens/LoginScreen';
+import './App.css';
 
 // --- COMPONENTS ---
 
@@ -49,19 +50,33 @@ const SlotMachine = ({ target, categoryId, onFinish }) => {
 };
 
 const PlayerAvatar = ({ name, colorIndex = 0, isActive }) => {
-  const colors = [
-    'from-rose-400 to-rose-500',
-    'from-blue-400 to-blue-500',
-    'from-purple-400 to-purple-500',
-    'from-amber-400 to-amber-500',
-    'from-emerald-400 to-emerald-500'
+  const gradients = [
+    'linear-gradient(135deg, #fb7185 0%, #e11d48 100%)',
+    'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)',
+    'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
+    'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)',
+    'linear-gradient(135deg, #10b981 0%, #059669 100%)'
   ];
   const initial = (name || '?').charAt(0).toUpperCase();
-  const bgGradient = colors[colorIndex % colors.length];
+  const bgGradient = gradients[colorIndex % gradients.length];
 
   return (
-    <div className={`w-10 h-10 bg-gradient-to-br ${bgGradient} rounded-2xl flex items-center justify-center border-2 border-white shadow-sm transition-all duration-300 transform ${isActive ? 'scale-110 shadow-md ring-2 ring-primary/20' : ''} shrink-0`}>
-      <span className="text-white font-black text-sm">{initial}</span>
+    <div
+      className={`avatar ${isActive ? 'active' : ''}`}
+      style={{
+        background: bgGradient,
+        width: '40px',
+        height: '40px',
+        borderRadius: '16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: '2px solid white',
+        boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+        flexShrink: 0
+      }}
+    >
+      <span style={{ color: 'white', fontWeight: 900, fontSize: '0.8rem' }}>{initial}</span>
     </div>
   );
 };
@@ -79,45 +94,61 @@ const ScoreBoard = ({ game, isP1, p1Ready, p2Ready }) => {
   const r2 = isP1 ? p2Ready : p1Ready;
 
   return (
-    <div className="w-full relative z-20 flex flex-col items-center">
+    <div style={{ width: '100%', position: 'relative', zIndex: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <div className="hud-card">
         {/* Lado 1 */}
-        <div className="flex items-center gap-2 min-w-0 flex-1">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
           <PlayerAvatar name={n1} colorIndex={isP1 ? 0 : 1} isActive={r1} />
-          <div className="flex flex-col min-w-0">
-            <span className={`text-[10px] font-black uppercase truncate leading-none mb-1 ${r1 ? 'text-primary' : 'text-slate-400'}`}>
+          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              color: r1 ? 'var(--primary)' : '#94a3b8',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}>
               {n1}
             </span>
-            <span className="text-sm font-black text-rose-500 leading-none">{s1}</span>
+            <span style={{ fontSize: '14px', fontWeight: 900, color: '#f43f5e' }}>{s1}</span>
           </div>
         </div>
 
         {/* Centro VS */}
-        <div className="px-4">
+        <div style={{ padding: '0 16px' }}>
           <motion.div
             animate={r1 && r2 ? { scale: [1, 1.2, 1] } : {}}
             transition={{ repeat: Infinity, duration: 1 }}
-            className="text-lg font-black italic text-primary opacity-30"
+            style={{ fontSize: '18px', fontWeight: 900, fontStyle: 'italic', color: 'var(--primary)', opacity: 0.3 }}
           >
             VS
           </motion.div>
         </div>
 
         {/* Lado 2 */}
-        <div className="flex items-center gap-2 min-w-0 flex-1 justify-end text-right">
-          <div className="flex flex-col min-w-0 items-end">
-            <span className={`text-[10px] font-black uppercase truncate leading-none mb-1 ${r2 ? 'text-secondary' : 'text-slate-400'}`}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0, justifyContent: 'flex-end', textAlign: 'right' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, alignItems: 'flex-end' }}>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              color: r2 ? 'var(--secondary)' : '#94a3b8',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}>
               {n2}
             </span>
-            <span className="text-sm font-black text-blue-500 leading-none">{s2}</span>
+            <span style={{ fontSize: '14px', fontWeight: 900, color: '#3b82f6' }}>{s2}</span>
           </div>
           <PlayerAvatar name={n2} colorIndex={isP1 ? 1 : 0} isActive={r2} />
         </div>
       </div>
 
-      <div className="flex items-center gap-1.5 opacity-30 mb-6">
-        <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-        <span className="text-[10px] font-black tracking-widest uppercase">SALA: {game.room_code}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', opacity: 0.3, marginBottom: '24px' }}>
+        <div style={{ width: '6px', height: '6px', backgroundColor: '#22c55e', borderRadius: '50%' }}></div>
+        <span style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '2px', textTransform: 'uppercase' }}>SALA: {game.room_code}</span>
       </div>
     </div>
   );
@@ -132,6 +163,7 @@ export default function App() {
   const [rolling, setRolling] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState('');
   const [isAllMode, setIsAllMode] = useState(false);
+  const [selectedGameType, setSelectedGameType] = useState(null);
 
   const sortear = (specificCat) => {
     const cat = specificCat || (isAllMode ? { id: 'all', name: '🔥 Modo Aleatório' } : activeCategory);
@@ -169,6 +201,22 @@ export default function App() {
       return unsubscribe;
     }
   }, [game?.id]);
+
+  // Auto-disconnect effect
+  useEffect(() => {
+    if (game?.status === 'cancelled') {
+      alert("A sala foi cancelada pelo mestre. 🚪");
+      exitRoom();
+    }
+    // If playing and partner is gone
+    if (game?.status === 'playing') {
+      const partnerGone = game.player2_id === null; // Handled by exitRoom in useGame
+      if (partnerGone) {
+        alert("Seu parceiro saiu da sala. 🚪");
+        exitRoom();
+      }
+    }
+  }, [game?.status, game?.player2_id]);
 
   const handleConfirmChoice = async () => {
     if (!selectedCharacter || !game?.id) return;
@@ -216,23 +264,81 @@ export default function App() {
     setRolling(false);
   };
 
-  if (loading) return <div className="child-container items-center justify-center min-h-screen"><h1 className="font-black animate-bounce text-2xl">🎈...</h1></div>;
+  if (loading) return (
+    <div className="child-container" style={{ justifyContent: 'center' }}>
+      <h1 style={{ fontSize: '2rem', fontWeight: 900 }} className="animate-bounce">🎈...</h1>
+    </div>
+  );
+
   if (!user) return <LoginScreen />;
 
   // --- VIEWS ---
 
+  const renderGameSelection = () => (
+    <div className="child-container">
+      <div style={{ textAlign: 'center', width: '100%', padding: '40px 0' }}>
+        <h1 className="text-hero">🎮 <br />Escolha o <span style={{ color: 'var(--primary)', fontStyle: 'italic' }}>Jogo</span></h1>
+        <p className="text-sub">Qual você quer jogar hoje?</p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginTop: '32px' }}>
+          <button
+            onClick={() => setSelectedGameType('guess')}
+            className="white-card"
+            style={{ textAlign: 'left', display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer' }}
+          >
+            <div style={{ width: '48px', height: '48px', background: 'var(--primary-light)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
+              <HelpCircle size={28} />
+            </div>
+            <div>
+              <h3 style={{ fontWeight: 900, fontSize: '1.1rem' }}>Quem Sou Eu?</h3>
+              <p style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 700 }}>Adivinhe o personagem na sua testa!</p>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setSelectedGameType('memory')}
+            className="white-card"
+            style={{ textAlign: 'left', display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer' }}
+          >
+            <div style={{ width: '48px', height: '48px', background: 'var(--secondary-light)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--secondary)' }}>
+              <Gamepad2 size={28} />
+            </div>
+            <div>
+              <h3 style={{ fontWeight: 900, fontSize: '1.1rem' }}>Jogo da Memória</h3>
+              <p style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 700 }}>Encontre os pares de personagens!</p>
+            </div>
+          </button>
+        </div>
+
+        <div style={{ marginTop: '32px' }}>
+          <button onClick={() => supabase.auth.signOut()} style={{ fontSize: '10px', fontWeight: 900, opacity: 0.3, textTransform: 'uppercase', letterSpacing: '2px', background: 'none', border: 'none', cursor: 'pointer' }}>
+            Sair da conta
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderLobby = () => (
     <div className="child-container">
-      <div className="text-center w-full py-8">
-        <h1 className="text-hero">🎯 <br />Quem Sou <span className="text-primary italic">Eu?</span></h1>
-        <p className="text-sub">Jogo divertido em dupla</p>
+      <div style={{ textAlign: 'center', width: '100%', padding: '40px 0' }}>
+        <button onClick={() => setSelectedGameType(null)} style={{ position: 'absolute', top: '16px', left: '16px', fontSize: '10px', fontWeight: 900, opacity: 0.3, textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer' }}>
+          ← Voltar
+        </button>
+        <h1 className="text-hero">
+          {selectedGameType === 'guess' ? '🎯' : '🃏'} <br />
+          {selectedGameType === 'guess' ? 'Quem Sou ' : 'Jogo da '}
+          <span style={{ color: 'var(--primary)', fontStyle: 'italic' }}>{selectedGameType === 'guess' ? 'Eu?' : 'Memória'}</span>
+        </h1>
+        <p className="text-sub">{selectedGameType === 'guess' ? 'Jogo divertido em dupla' : 'Treine sua mente em dupla'}</p>
 
-        <div className="white-card space-y-6">
-          <div className="space-y-4">
+        <div className="white-card" style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '32px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <input
               type="text"
               placeholder="Seu Nome 👤"
-              className="input-child text-sm"
+              className="input-child"
+              style={{ fontSize: '0.9rem' }}
               maxLength={12}
               value={playerName}
               onChange={e => setPlayerName(e.target.value)}
@@ -240,24 +346,24 @@ export default function App() {
             <button
               onClick={async () => {
                 try {
-                  await createRoom(playerName);
+                  await createRoom(playerName, selectedGameType);
                 } catch (err) {
-                  alert("Erro ao criar sala. ❌");
+                  alert("Erro ao criar sala: " + (err.message || "Erro desconhecido") + " ❌");
                 }
               }}
-              className="btn-puffy btn-purple"
+              className={`btn-puffy ${selectedGameType === 'guess' ? 'btn-purple' : 'btn-blue'}`}
             >
               <Users size={24} /> CRIAR SALA
             </button>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="h-[2px] bg-slate-50 flex-1"></div>
-            <span className="text-[10px] font-black opacity-20 uppercase">OU</span>
-            <div className="h-[2px] bg-slate-50 flex-1"></div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ height: '2px', background: '#f1f5f9', flex: 1 }}></div>
+            <span style={{ fontSize: '10px', fontWeight: 900, opacity: 0.2, textTransform: 'uppercase' }}>OU</span>
+            <div style={{ height: '2px', background: '#f1f5f9', flex: 1 }}></div>
           </div>
 
-          <div className="space-y-3">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <input
               type="text"
               placeholder="Código da Sala 🎯"
@@ -280,12 +386,6 @@ export default function App() {
             </button>
           </div>
         </div>
-
-        <div className="mt-8">
-          <button onClick={() => supabase.auth.signOut()} className="text-[10px] font-black opacity-30 hover:opacity-100 uppercase tracking-widest">
-            Sair da conta
-          </button>
-        </div>
       </div>
     </div>
   );
@@ -299,61 +399,61 @@ export default function App() {
       <div className="child-container">
         <ScoreBoard game={game} isP1={isP1} p1Ready={!!game.player1_character} p2Ready={!!game.player2_character} />
 
-        <div className="text-center mb-6">
-          <h2 className="text-xl font-black">🎯 Seu personagem</h2>
+        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 900 }}>🎯 Seu personagem</h2>
         </div>
 
-        <div className="w-full">
+        <div style={{ width: '100%' }}>
           {!game.player2_id ? (
-            <div className="white-card">
-              <div className="text-5xl mb-4 animate-bounce">🎈</div>
-              <h3 className="text-2xl font-black">ESPERE UM AMIGO</h3>
-              <p className="text-sm opacity-50 font-bold leading-relaxed px-4 py-4">
+            <div className="white-card" style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '16px' }} className="animate-bounce">🎈</div>
+              <h3 style={{ fontSize: '1.5rem', fontWeight: 900 }}>ESPERE UM AMIGO</h3>
+              <p style={{ fontSize: '0.875rem', opacity: 0.5, fontWeight: 700, lineHeight: 1.6, padding: '16px 0' }}>
                 Passe o código <br />
-                <span className="text-3xl text-primary font-black block mt-2 tracking-widest">{game.room_code}</span>
+                <span style={{ fontSize: '2rem', color: 'var(--primary)', fontWeight: 900, display: 'block', marginTop: '8px', letterSpacing: '4px' }}>{game.room_code}</span>
               </p>
-              <button onClick={exitRoom} className="btn-puffy btn-light text-xs mt-4">CANCELAR SALA 🚪</button>
+              <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.75rem', marginTop: '16px' }}>CANCELAR SALA 🚪</button>
             </div>
           ) : (
             <>
               {myChoiceDone ? (
-                <div className="white-card">
-                  <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center animate-pulse mx-auto mb-6">
-                    <RotateCcw size={32} className="text-primary" />
+                <div className="white-card" style={{ textAlign: 'center' }}>
+                  <div style={{ width: '64px', height: '64px', background: '#f8fafc', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }} className="animate-pulse">
+                    <RotateCcw size={32} style={{ color: 'var(--primary)' }} />
                   </div>
-                  <h3 className="text-xl font-black uppercase mb-2">TUDO PRONTO! ✅</h3>
-                  <p className="text-sm opacity-50 font-bold mb-8">Esperando seu amigo...</p>
-                  <div className="space-y-4">
-                    <button onClick={fetchGame} className="btn-puffy btn-light text-xs">ATUALIZAR STATUS 🔄</button>
-                    <button onClick={exitRoom} className="btn-puffy btn-light text-xs text-rose-500">SAIR DA SALA 🚪</button>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 900, textTransform: 'uppercase', marginBottom: '8px' }}>TUDO PRONTO! ✅</h3>
+                  <p style={{ fontSize: '0.875rem', opacity: 0.5, fontWeight: 700, marginBottom: '32px' }}>Esperando seu amigo...</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <button onClick={fetchGame} className="btn-puffy btn-light" style={{ fontSize: '0.75rem' }}>ATUALIZAR STATUS 🔄</button>
+                    <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.75rem', color: '#f43f5e' }}>SAIR DA SALA 🚪</button>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <div className="white-card">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div className="white-card" style={{ textAlign: 'center' }}>
                     <span className="badge">{isAllMode ? '🔥 MODO ALEATÓRIO' : activeCategory.name}</span>
                     {rolling ? (
                       <SlotMachine target={selectedCharacter} categoryId={isAllMode ? 'all' : activeCategory.id} onFinish={() => setRolling(false)} />
                     ) : (
-                      <h3 className="text-hero text-black animate-scale-in text-4xl">{selectedCharacter}</h3>
+                      <h3 className="text-hero" style={{ color: 'black', fontSize: '2.5rem' }}>{selectedCharacter}</h3>
                     )}
                     {!rolling && (
-                      <button onClick={handleConfirmChoice} className="btn-puffy btn-blue mt-6 shadow-lg">ESCOLHER ESTE! 🚀</button>
+                      <button onClick={handleConfirmChoice} className="btn-puffy btn-blue" style={{ marginTop: '24px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>ESCOLHER ESTE! 🚀</button>
                     )}
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button onClick={() => sortear()} className="btn-puffy btn-light text-xs"><Dice5 size={18} /> OUTRO</button>
-                    <button onClick={trocarCategoria} className="btn-puffy btn-light text-xs"><RotateCcw size={18} /> LISTA</button>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <button onClick={() => sortear()} className="btn-puffy btn-light" style={{ fontSize: '0.75rem' }}><Dice5 size={18} /> OUTRO</button>
+                    <button onClick={trocarCategoria} className="btn-puffy btn-light" style={{ fontSize: '0.75rem' }}><RotateCcw size={18} /> LISTA</button>
                   </div>
-                  <button onClick={modoAleatorio} className="btn-puffy btn-purple text-xs">🔥 MODO ALEATÓRIO TOTAL</button>
-                  <button onClick={exitRoom} className="btn-puffy btn-light text-rose-500 text-sm mt-4">SAIR DA SALA 🚪</button>
+                  <button onClick={modoAleatorio} className="btn-puffy btn-purple" style={{ fontSize: '0.75rem' }}>🔥 MODO ALEATÓRIO TOTAL</button>
+                  <button onClick={exitRoom} className="btn-puffy btn-light" style={{ color: '#f43f5e', fontSize: '0.875rem', marginTop: '16px' }}>SAIR DA SALA 🚪</button>
                 </div>
               )}
             </>
           )}
 
           {(myChoiceDone && opponentChoiceDone) && (
-            <button onClick={() => updateGame(game.id, { status: 'playing' })} className="btn-puffy btn-green mt-6 animate-bounce shadow-xl">JOGAR AGORA! ▶️</button>
+            <button onClick={() => updateGame(game.id, { status: 'playing' })} className="btn-puffy btn-green" style={{ marginTop: '24px', animation: 'bounce 2s infinite' }}>JOGAR AGORA! ▶️</button>
           )}
         </div>
       </div>
@@ -368,31 +468,31 @@ export default function App() {
       <div className="child-container">
         <ScoreBoard game={game} isP1={isP1} p1Ready={!!game.player1_character} p2Ready={!!game.player2_character} />
 
-        <div className="text-center mb-6 w-full">
-          <span className="badge bg-primary text-white">🎮 SEU AMIGO É...</span>
+        <div style={{ textAlign: 'center', marginBottom: '24px', width: '100%' }}>
+          <span className="badge" style={{ background: 'var(--primary)', color: 'white' }}>🎮 SEU AMIGO É...</span>
           <div className="white-card">
-            <h2 className="font-black text-4xl tracking-tight">{opponentChar}</h2>
-            <p className="text-[10px] font-black uppercase opacity-30 mt-2">Dê dicas para ele!</p>
+            <h2 style={{ fontWeight: 900, fontSize: '2.5rem', letterSpacing: '-0.025em' }}>{opponentChar}</h2>
+            <p style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', opacity: 0.3, marginTop: '8px' }}>Dê dicas para ele!</p>
           </div>
         </div>
 
-        <div className="text-center mb-8 w-full">
-          <span className="badge bg-secondary text-white">🤔 QUEM SURPRESA?</span>
-          <div className="white-card py-10">
-            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <HelpCircle size={32} className="text-slate-200 animate-pulse" />
+        <div style={{ textAlign: 'center', marginBottom: '32px', width: '100%' }}>
+          <span className="badge" style={{ background: 'var(--secondary)', color: 'white' }}>🤔 QUEM SURPRESA?</span>
+          <div className="white-card" style={{ padding: '40px 0' }}>
+            <div style={{ width: '64px', height: '64px', background: '#f8fafc', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <HelpCircle size={32} style={{ color: '#e2e8f0' }} className="animate-pulse" />
             </div>
-            <p className="text-[10px] font-black opacity-20 tracking-widest">FAÇA PERGUNTAS!</p>
+            <p style={{ fontSize: '10px', fontWeight: 900, opacity: 0.2, letterSpacing: '4px' }}>FAÇA PERGUNTAS!</p>
           </div>
         </div>
 
-        <div className="mt-auto w-full space-y-4">
-          <button className="btn-puffy btn-purple shadow-xl" onClick={() => (confetti(), window.navigator.vibrate?.(50))}>
-            <Star size={24} fill="white" className="text-white" /> TIVE UMA IDEIA!
+        <div style={{ marginTop: 'auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <button className="btn-puffy btn-purple" style={{ boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }} onClick={() => (confetti(), window.navigator.vibrate?.(50))}>
+            <Star size={24} fill="white" style={{ color: 'white' }} /> TIVE UMA IDEIA!
           </button>
-          <div className="grid grid-cols-2 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <button className="btn-puffy btn-rose" onClick={handleWin}>ACERTOU! 🎉</button>
-            <button className="btn-puffy btn-light text-xs" onClick={exitRoom}>SAIR 🚪</button>
+            <button className="btn-puffy btn-light" style={{ fontSize: '0.75rem' }} onClick={exitRoom}>SAIR 🚪</button>
           </div>
         </div>
       </div>
@@ -402,16 +502,294 @@ export default function App() {
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={!game ? 'lobby' : game.status}
+        key={!game ? (selectedGameType ? 'lobby' : 'selection') : game.status}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        className="w-full flex justify-center"
+        style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
       >
-        {!game && renderLobby()}
-        {game?.status === 'setup' && renderSetup()}
-        {game?.status === 'playing' && renderPlaying()}
+        {!game && (
+          !selectedGameType ? renderGameSelection() : renderLobby()
+        )}
+
+        {game?.status === 'setup' && (
+          game.game_type === 'memory' ? <MemoryGameSetup game={game} user={user} exitRoom={exitRoom} /> : renderSetup()
+        )}
+
+        {game?.status === 'playing' && (
+          game.game_type === 'memory' ? <MemoryGame game={game} user={user} exitRoom={exitRoom} /> : renderPlaying()
+        )}
       </motion.div>
     </AnimatePresence>
   );
 }
+
+// --- MEMORY GAME COMPONENTS ---
+
+const animalEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐻‍❄️', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐙', '🦖'];
+const foodEmojis = ['🍕', '🍔', '🍟', '🌭', '🥪', '🌮', '🌯', '🥗', '🥘', '🍲', '🍱', '🍣', '🍛', '🍜', '🍜', '🍝', '🍦', '🍩', '🍪', '🍫'];
+const mixEmojis = ['🚀', '⚡', '🌈', '💎', '🔥', '🎨', '🎬', '🎮', '🎧', '🎸', '⚽', '🏀', '🏆', '🎩', '🧤', '🍭', '🍔', '🍦', '🚗', '🛸'];
+
+const getCharacterContent = (content) => {
+  if (!content) return { emoji: null, name: '' };
+  // In Memory Game, content is already the emoji string from the pools
+  return { emoji: content, name: '' };
+};
+
+const MemoryGameSetup = ({ game, user, exitRoom }) => {
+  const { updateGame } = useGame();
+  const [selectedCategory, setSelectedCategory] = useState('animals');
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(game.room_code);
+    confetti({ particleCount: 40, spread: 30, origin: { y: 0.8 } });
+  };
+
+  const handleStart = async () => {
+    try {
+      let pool;
+      if (selectedCategory === 'animals') pool = animalEmojis;
+      else if (selectedCategory === 'food') pool = foodEmojis;
+      else pool = mixEmojis;
+
+      const shuffled = [...pool].sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 10);
+      const cards = [...selected, ...selected]
+        .sort(() => 0.5 - Math.random())
+        .map((content, index) => ({
+          id: index,
+          content: content,
+          flipped: false,
+          matched: false
+        }));
+
+      await updateGame(game.id, {
+        status: 'playing',
+        board_state: { cards },
+        current_turn: 'p1',
+        turn_start_at: new Date().toISOString()
+      });
+    } catch (err) {
+      console.error("Erro ao iniciar jogo:", err);
+      alert("Erro ao iniciar o jogo! Verifique se seu banco de dados está atualizado (veja o arquivo SQL). ❌\n\nErro: " + (err.message || err));
+    }
+  };
+
+  return (
+    <div className="child-container">
+      <div className="white-card shadow-lg" style={{ maxWidth: '400px', textAlign: 'center' }}>
+        <div style={{ fontSize: '5rem', marginBottom: '10px' }}>🃏</div>
+        <h2 className="text-hero" style={{ fontSize: '2rem' }}>JOGO DA MEMÓRIA</h2>
+        <p className="text-sub">Treine seu cérebro em dupla!</p>
+
+        {!game.player2_id ? (
+          <div style={{ marginTop: '20px' }}>
+            <div className="room-code-box" onClick={handleCopy}>
+              <span style={{ fontSize: '0.6rem', opacity: 0.4, display: 'block', fontWeight: 900 }}>TOQUE PARA COPIAR O CÓDIGO</span>
+              <span className="text-hero" style={{ color: 'var(--primary)', letterSpacing: '6px', fontSize: '3rem' }}>{game.room_code}</span>
+              <span className="copy-hint text-primary">COPIAR 📋</span>
+            </div>
+            <p className="text-sub" style={{ marginTop: '15px' }}>O jogo começará assim que seu amigo entrar.</p>
+            <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.75rem', marginTop: '16px' }}>CANCELAR SALA 🚪</button>
+          </div>
+        ) : (
+          <div style={{ marginTop: '20px' }}>
+            <div style={{
+              background: '#f0fdf4',
+              color: '#16a34a',
+              padding: '12px 24px',
+              borderRadius: '20px',
+              fontWeight: 900,
+              fontSize: '0.8rem',
+              border: '2px solid #dcfce7',
+              marginBottom: '24px'
+            }}>
+              AMIGO CONECTADO! ✅
+            </div>
+
+            {game.player1_id === user.id ? (
+              <div style={{ marginTop: '24px' }}>
+                <div className="category-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+                  <button onClick={() => setSelectedCategory('animals')} className={`cat-btn ${selectedCategory === 'animals' ? 'active' : ''}`}>
+                    <span style={{ fontSize: '1.5rem', display: 'block' }}>🐯</span>
+                    <span style={{ fontSize: '0.6rem', fontWeight: 900 }}>ANIMAIS</span>
+                  </button>
+                  <button onClick={() => setSelectedCategory('food')} className={`cat-btn ${selectedCategory === 'food' ? 'active' : ''}`}>
+                    <span style={{ fontSize: '1.5rem', display: 'block' }}>🍕</span>
+                    <span style={{ fontSize: '0.6rem', fontWeight: 900 }}>COMIDA</span>
+                  </button>
+                  <button onClick={() => setSelectedCategory('mix')} className={`cat-btn ${selectedCategory === 'mix' ? 'active' : ''}`}>
+                    <span style={{ fontSize: '1.5rem', display: 'block' }}>🚀</span>
+                    <span style={{ fontSize: '0.6rem', fontWeight: 900 }}>MIX</span>
+                  </button>
+                </div>
+                <button onClick={handleStart} className="btn-puffy btn-green animate-bounce-slow">
+                  COMEÇAR AGORA! 🚀
+                </button>
+              </div>
+            ) : (
+              <div style={{ padding: '30px 0' }}>
+                <div style={{ width: '40px', height: '40px', border: '5px solid #f1f5f9', borderTopColor: 'var(--primary)', borderRadius: '50%', margin: '0 auto 15px' }} className="animate-spin"></div>
+                <p className="text-sub">O MESTRE ESTÁ ESCOLHENDO...</p>
+              </div>
+            )}
+            <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.875rem', marginTop: '16px', background: 'transparent', boxShadow: 'none', color: '#94a3b8' }}>SAIR DA SALA</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const MemoryGame = ({ game, user, exitRoom }) => {
+  const { updateGame } = useGame();
+  const isP1 = game.player1_id === user.id;
+  const myTurn = (game.current_turn === 'p1' && isP1) || (game.current_turn === 'p2' && !isP1);
+  const cards = game.board_state?.cards || [];
+
+  const [timeLeft, setTimeLeft] = useState(15);
+  const turnDuration = 15; // seconds
+
+  useEffect(() => {
+    // Reset timer when turn changes
+    setTimeLeft(turnDuration);
+    const interval = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 0) {
+          clearInterval(interval);
+          handleTimeOut();
+          return 0;
+        }
+        return prev - 0.1;
+      });
+    }, 100);
+    return () => clearInterval(interval);
+  }, [game.current_turn]);
+
+  const handleTimeOut = async () => {
+    if (myTurn) {
+      await updateGame(game.id, {
+        current_turn: game.current_turn === 'p1' ? 'p2' : 'p1'
+      });
+    }
+  };
+
+  const handleFlip = async (index) => {
+    if (!myTurn || cards[index].flipped || cards[index].matched) return;
+
+    const totalFlipped = cards.filter(c => c.flipped && !c.matched).length;
+    if (totalFlipped >= 2) return;
+
+    const newCards = [...cards];
+    newCards[index].flipped = true;
+
+    // Simple audio feedback via Web Audio API
+    const playNote = (freq, type = 'sine') => {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type; osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.05, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.2);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime + 0.2);
+      } catch (e) { }
+    };
+
+    playNote(440);
+
+    const flippedIndices = newCards.map((c, i) => c.flipped && !c.matched ? i : -1).filter(i => i !== -1);
+
+    if (flippedIndices.length === 2) {
+      const [idx1, idx2] = flippedIndices;
+      if (newCards[idx1].content === newCards[idx2].content) {
+        newCards[idx1].matched = true;
+        newCards[idx2].matched = true;
+        playNote(880, 'triangle');
+
+        const allMatched = newCards.every(c => c.matched);
+        const newScores = { ...game.scores };
+        newScores[game.current_turn] = (newScores[game.current_turn] || 0) + 1;
+
+        await updateGame(game.id, {
+          board_state: { cards: newCards },
+          scores: newScores,
+          status: allMatched ? 'setup' : 'playing'
+        });
+
+        if (allMatched) {
+          confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
+        }
+      } else {
+        await updateGame(game.id, { board_state: { cards: newCards } });
+        setTimeout(async () => {
+          const resetCards = [...newCards];
+          resetCards[idx1].flipped = false;
+          resetCards[idx2].flipped = false;
+          await updateGame(game.id, {
+            board_state: { cards: resetCards },
+            current_turn: game.current_turn === 'p1' ? 'p2' : 'p1'
+          });
+        }, 1000);
+      }
+    } else {
+      await updateGame(game.id, { board_state: { cards: newCards } });
+    }
+  };
+
+  const matchedCount = cards.filter(c => c.matched).length / 2;
+  const totalPairs = cards.length / 2;
+  const progressPercent = (matchedCount / (totalPairs || 1)) * 100;
+
+  return (
+    <div className="child-container">
+      <ScoreBoard game={game} isP1={isP1} p1Ready={true} p2Ready={true} />
+
+      <div className={`turn-badge ${myTurn ? 'active' : 'waiting'}`}>
+        {myTurn ? '👉 SEU TURNO! 👀' : '⌛ ESPERE O AMIGO...'}
+      </div>
+
+      <div style={{ width: '100%', maxWidth: '400px' }}>
+        <div className="timer-container">
+          <div
+            className="timer-progress"
+            style={{ width: `${(timeLeft / turnDuration) * 100}%`, backgroundColor: timeLeft < 3 ? 'var(--secondary)' : 'var(--mint)' }}
+          ></div>
+        </div>
+      </div>
+
+      <div className="memory-grid">
+        {cards.map((card, i) => (
+          <div key={i} className={`memory-card ${card.flipped || card.matched ? 'flipped' : ''}`} onClick={() => handleFlip(i)}>
+            <div className="card-inner">
+              <div className="card-front">
+                <HelpCircle size={32} className="card-front-icon" />
+              </div>
+              <div className={`card-back ${card.matched ? 'matched' : ''}`}>
+                {getCharacterContent(card.content).emoji ? (
+                  <span className="card-emoji">{getCharacterContent(card.content).emoji}</span>
+                ) : null}
+                <span className="card-name" style={{ fontSize: getCharacterContent(card.content).emoji ? '0.5rem' : '0.75rem' }}>
+                  {card.content}
+                </span>
+                {card.matched && <div className="match-check"><Star size={12} fill="white" /></div>}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="overall-progress">
+        <span style={{ fontSize: '0.65rem', fontWeight: 900, color: '#94a3b8' }}>{matchedCount} DE {totalPairs} PARES ENCONTRADOS</span>
+        <div className="progress-track">
+          <div className="progress-fill" style={{ width: `${progressPercent}%` }}></div>
+        </div>
+      </div>
+
+      <div style={{ padding: '40px 0', width: '100%', display: 'flex', justifyContent: 'center' }}>
+        <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.75rem', color: '#94a3b8', background: 'transparent', boxShadow: 'none' }}>SAIR DO JOGO 🚪</button>
+      </div>
+    </div>
+  );
+};
