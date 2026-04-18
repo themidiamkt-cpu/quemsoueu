@@ -752,7 +752,15 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
     { attribute: 'genero', value: 'masculino', label: '👨 Homem?', emoji: '👨' },
     { attribute: 'genero', value: 'feminino', label: '👩 Mulher?', emoji: '👩' },
     { attribute: 'chapeu', value: true, label: '🎩 Chapéu?', emoji: '🎩' },
+    { attribute: 'barba', value: true, label: '🧔 Barba?', emoji: '🧔' },
+    { attribute: 'cabelo', value: 'loiro', label: '🟡 Loiro?', emoji: '🟡' },
+    { attribute: 'cabelo', value: 'preto', label: '⚫ Preto?', emoji: '⚫' },
+    { attribute: 'cabelo', value: 'castanho', label: '🟤 Castanho?', emoji: '🟤' },
+    { attribute: 'cabelo', value: 'branco', label: '⚪ Branco?', emoji: '⚪' },
+    { attribute: 'cabelo', value: 'ruivo', label: '🟠 Ruivo?', emoji: '🟠' },
   ];
+
+  const suggestionCount = board.filter(c => !myEliminations.includes(c.name) && getSuggestion(c) === 'eliminate').length;
 
   return (
     <div className="child-container">
