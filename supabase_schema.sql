@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS public.games (
     player2_id uuid REFERENCES auth.users(id),
     player1_character text,
     player2_character text,
+    player1_name text,
+    player2_name text,
     current_turn text DEFAULT 'p1',
     status text DEFAULT 'setup',
     scores jsonb DEFAULT '{"p1": 0, "p2": 0}'::jsonb

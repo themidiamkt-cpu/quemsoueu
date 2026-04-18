@@ -64,6 +64,7 @@ export default function App() {
   const { user, game, loading, createRoom, joinRoom, exitRoom, subscribeToGame, updateGame, fetchGame } = useGame();
 
   const [roomCode, setRoomCode] = useState('');
+  const [playerName, setPlayerName] = useState('');
   const [activeCategory, setActiveCategory] = useState(categories[0]);
   const [rolling, setRolling] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState('');
@@ -173,9 +174,19 @@ export default function App() {
         <p className="text-sub">Jogo divertido em dupla</p>
 
         <div className="white-card space-y-6">
-          <button onClick={createRoom} className="btn-puffy btn-purple text-white">
-            <Users size={28} /> CRIAR SALA
-          </button>
+          <div className="space-y-4">
+            <input
+              type="text"
+              placeholder="Seu Nome 👤"
+              className="input-child h-14 text-sm"
+              maxLength={12}
+              value={playerName}
+              onChange={e => setPlayerName(e.target.value)}
+            />
+            <button onClick={() => createRoom(playerName)} className="btn-puffy btn-purple text-white">
+              <Users size={28} /> CRIAR SALA
+            </button>
+          </div>
 
           <div className="flex items-center gap-3">
             <div className="h-[2px] bg-slate-100 flex-1"></div>
@@ -193,7 +204,7 @@ export default function App() {
               onChange={e => setRoomCode(e.target.value.toUpperCase())}
             />
             <button
-              onClick={() => roomCode && joinRoom(roomCode)}
+              onClick={() => roomCode && joinRoom(roomCode, playerName)}
               className={`btn-puffy btn-green text-white transition-opacity ${!roomCode ? 'opacity-50' : ''}`}
             >
               <Play size={28} /> ENTRAR
@@ -314,14 +325,18 @@ export default function App() {
         <FloatingDecor />
 
         {/* Placar */}
-        <div className="flex justify-center gap-4 mb-4 relative z-10">
-          <div className="bg-white px-4 py-2 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
-            <span className="text-[10px] font-black opacity-30">VOCÊ</span>
+        <div className="flex justify-center gap-4 mb-4 relative z-10 w-full px-4 text-center">
+          <div className="bg-white flex-1 py-2 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center">
+            <span className="text-[9px] font-black opacity-30 uppercase truncate w-full px-2">
+              {isP1 ? (game.player1_name || 'VOCÊ') : (game.player2_name || 'VOCÊ')}
+            </span>
             <span className="text-xl font-black text-primary">{isP1 ? scores.p1 : scores.p2}</span>
           </div>
-          <div className="bg-white px-4 py-2 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
+          <div className="bg-white flex-1 py-2 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center">
             <span className="text-xl font-black text-secondary">{isP1 ? scores.p2 : scores.p1}</span>
-            <span className="text-[10px] font-black opacity-30">AMIGO</span>
+            <span className="text-[9px] font-black opacity-30 uppercase truncate w-full px-2">
+              {isP1 ? (game.player2_name || 'AMIGO') : (game.player1_name || 'AMIGO')}
+            </span>
           </div>
         </div>
 

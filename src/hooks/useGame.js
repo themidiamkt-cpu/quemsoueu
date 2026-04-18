@@ -20,7 +20,7 @@ export function useGame() {
         return () => subscription.unsubscribe();
     }, []);
 
-    const createRoom = async () => {
+    const createRoom = async (p1Name) => {
         if (!user) return;
 
         // Generate a simple 6-char code
@@ -31,6 +31,7 @@ export function useGame() {
             .insert([
                 {
                     player1_id: user.id,
+                    player1_name: p1Name || 'Jogador 1',
                     player2_id: null, // Open for anyone with the code
                     room_code: code,
                     status: 'setup',
@@ -45,7 +46,7 @@ export function useGame() {
         return data;
     };
 
-    const joinRoom = async (code) => {
+    const joinRoom = async (code, p2Name) => {
         if (!user || !code) return;
 
         const cleanCode = code.trim().toUpperCase();
@@ -68,7 +69,10 @@ export function useGame() {
         // 2. Join the room
         const { data: joined, error: joinError } = await supabase
             .from('games')
-            .update({ player2_id: user.id })
+            .update({
+                player2_id: user.id,
+                player2_name: p2Name || 'Jogador 2'
+            })
             .eq('id', room.id)
             .select()
             .single();
