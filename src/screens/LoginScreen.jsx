@@ -40,9 +40,9 @@ export default function LoginScreen() {
         <div className="child-container flex flex-col justify-center min-h-screen items-center px-4 relative">
             <FloatingDecor />
 
-            <div className="w-full max-w-[360px] relative z-10">
-                <div className="text-center mb-8">
-                    <h1 className="text-hero text-black text-4xl mb-2">
+            <div className="w-full max-w-[360px] relative z-10" style={{ padding: '20px 0' }}>
+                <div className="text-center mb-6">
+                    <h1 className="text-hero text-black text-3xl mb-1">
                         🎯 Quem Sou <span className="text-primary italic">Eu?</span>
                     </h1>
                     <p className="text-sm font-bold text-black opacity-50">

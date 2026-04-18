@@ -95,13 +95,13 @@ const ScoreBoard = ({ game, isP1, p1Ready, p2Ready }) => {
 
   return (
     <div style={{ width: '100%', position: 'relative', zIndex: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div className="hud-card">
+      <div className="hud-card" style={{ marginBottom: '8px' }}>
         {/* Lado 1 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
           <PlayerAvatar name={n1} colorIndex={isP1 ? 0 : 1} isActive={r1} />
           <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
             <span style={{
-              fontSize: '10px',
+              fontSize: '9px',
               fontWeight: 900,
               textTransform: 'uppercase',
               color: r1 ? 'var(--primary)' : '#94a3b8',
@@ -111,16 +111,16 @@ const ScoreBoard = ({ game, isP1, p1Ready, p2Ready }) => {
             }}>
               {n1}
             </span>
-            <span style={{ fontSize: '14px', fontWeight: 900, color: '#f43f5e' }}>{s1}</span>
+            <span style={{ fontSize: '13px', fontWeight: 900, color: '#f43f5e', lineHeight: 1 }}>{s1}</span>
           </div>
         </div>
 
         {/* Centro VS */}
-        <div style={{ padding: '0 16px' }}>
+        <div style={{ padding: '0 8px' }}>
           <motion.div
-            animate={r1 && r2 ? { scale: [1, 1.2, 1] } : {}}
+            animate={r1 && r2 ? { scale: [1, 1.1, 1] } : {}}
             transition={{ repeat: Infinity, duration: 1 }}
-            style={{ fontSize: '18px', fontWeight: 900, fontStyle: 'italic', color: 'var(--primary)', opacity: 0.3 }}
+            style={{ fontSize: '14px', fontWeight: 900, fontStyle: 'italic', color: 'var(--primary)', opacity: 0.3 }}
           >
             VS
           </motion.div>
@@ -130,7 +130,7 @@ const ScoreBoard = ({ game, isP1, p1Ready, p2Ready }) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0, justifyContent: 'flex-end', textAlign: 'right' }}>
           <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, alignItems: 'flex-end' }}>
             <span style={{
-              fontSize: '10px',
+              fontSize: '9px',
               fontWeight: 900,
               textTransform: 'uppercase',
               color: r2 ? 'var(--secondary)' : '#94a3b8',
@@ -140,15 +140,15 @@ const ScoreBoard = ({ game, isP1, p1Ready, p2Ready }) => {
             }}>
               {n2}
             </span>
-            <span style={{ fontSize: '14px', fontWeight: 900, color: '#3b82f6' }}>{s2}</span>
+            <span style={{ fontSize: '13px', fontWeight: 900, color: '#3b82f6', lineHeight: 1 }}>{s2}</span>
           </div>
           <PlayerAvatar name={n2} colorIndex={isP1 ? 1 : 0} isActive={r2} />
         </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', opacity: 0.3, marginBottom: '24px' }}>
-        <div style={{ width: '6px', height: '6px', backgroundColor: '#22c55e', borderRadius: '50%' }}></div>
-        <span style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '2px', textTransform: 'uppercase' }}>SALA: {game.room_code}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', opacity: 0.3, marginBottom: '12px' }}>
+        <div style={{ width: '4px', height: '4px', backgroundColor: '#22c55e', borderRadius: '50%' }}></div>
+        <span style={{ fontSize: '9px', fontWeight: 900, letterSpacing: '1px', textTransform: 'uppercase' }}>SALA: {game.room_code}</span>
       </div>
     </div>
   );
@@ -276,50 +276,50 @@ export default function App() {
 
   const renderGameSelection = () => (
     <div className="child-container">
-      <div style={{ textAlign: 'center', width: '100%', padding: '40px 0' }}>
-        <h1 className="text-hero">🎮 <br />Escolha o <span style={{ color: 'var(--primary)', fontStyle: 'italic' }}>Jogo</span></h1>
-        <p className="text-sub">Qual você quer jogar hoje?</p>
+      <div style={{ textAlign: 'center', width: '100%', padding: '20px 0' }}>
+        <h1 className="text-hero" style={{ fontSize: '1.75rem' }}>🎮 <br />Escolha o <span style={{ color: 'var(--primary)', fontStyle: 'italic' }}>Jogo</span></h1>
+        <p className="text-sub" style={{ marginBottom: '24px' }}>Qual você quer jogar hoje?</p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginTop: '32px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px', marginTop: '12px' }}>
           <button
             onClick={() => setSelectedGameType('guess')}
             className="white-card"
-            style={{ textAlign: 'left', display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer' }}
+            style={{ textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', padding: '1rem' }}
           >
-            <div style={{ width: '48px', height: '48px', background: 'var(--primary-light)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
-              <HelpCircle size={28} />
+            <div style={{ width: '40px', height: '40px', background: 'var(--primary-light)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', flexShrink: 0 }}>
+              <HelpCircle size={24} />
             </div>
             <div>
-              <h3 style={{ fontWeight: 900, fontSize: '1.1rem' }}>Quem Sou Eu?</h3>
-              <p style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 700 }}>Adivinhe o personagem na sua testa!</p>
+              <h3 style={{ fontWeight: 900, fontSize: '1rem' }}>Quem Sou Eu?</h3>
+              <p style={{ fontSize: '0.6rem', opacity: 0.5, fontWeight: 700 }}>Adivinhe o personagem na sua testa!</p>
             </div>
           </button>
 
           <button
             onClick={() => setSelectedGameType('memory')}
             className="white-card"
-            style={{ textAlign: 'left', display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer' }}
+            style={{ textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', padding: '1rem' }}
           >
-            <div style={{ width: '48px', height: '48px', background: 'var(--secondary-light)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--secondary)' }}>
-              <Gamepad2 size={28} />
+            <div style={{ width: '40px', height: '40px', background: 'var(--secondary-light)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--secondary)', flexShrink: 0 }}>
+              <Gamepad2 size={24} />
             </div>
             <div>
-              <h3 style={{ fontWeight: 900, fontSize: '1.1rem' }}>Jogo da Memória</h3>
-              <p style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 700 }}>Encontre os pares de personagens!</p>
+              <h3 style={{ fontWeight: 900, fontSize: '1rem' }}>Jogo da Memória</h3>
+              <p style={{ fontSize: '0.6rem', opacity: 0.5, fontWeight: 700 }}>Encontre os pares de personagens!</p>
             </div>
           </button>
 
           <button
             onClick={() => setSelectedGameType('cara-a-cara')}
             className="white-card"
-            style={{ textAlign: 'left', display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer' }}
+            style={{ textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', padding: '1rem' }}
           >
-            <div style={{ width: '48px', height: '48px', background: 'var(--mint-light)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--mint)' }}>
-              <Users size={28} />
+            <div style={{ width: '40px', height: '40px', background: 'var(--mint-light)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--mint)', flexShrink: 0 }}>
+              <Users size={24} />
             </div>
             <div>
-              <h3 style={{ fontWeight: 900, fontSize: '1.1rem' }}>Cara a Cara</h3>
-              <p style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 700 }}>Adivinhe quem é o outro!</p>
+              <h3 style={{ fontWeight: 900, fontSize: '1rem' }}>Cara a Cara</h3>
+              <p style={{ fontSize: '0.6rem', opacity: 0.5, fontWeight: 700 }}>Adivinhe quem é o outro!</p>
             </div>
           </button>
         </div>
@@ -335,22 +335,22 @@ export default function App() {
 
   const renderLobby = () => (
     <div className="child-container">
-      <div style={{ textAlign: 'center', width: '100%', padding: '40px 0' }}>
-        <button onClick={() => setSelectedGameType(null)} style={{ position: 'absolute', top: '16px', left: '16px', fontSize: '10px', fontWeight: 900, opacity: 0.3, textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer' }}>
+      <div style={{ textAlign: 'center', width: '100%', padding: '20px 0' }}>
+        <button onClick={() => setSelectedGameType(null)} style={{ position: 'absolute', top: '16px', left: '16px', fontSize: '9px', fontWeight: 900, opacity: 0.3, textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer' }}>
           ← Voltar
         </button>
-        <h1 className="text-hero">
+        <h1 className="text-hero" style={{ fontSize: '1.75rem' }}>
           {selectedGameType === 'guess' ? '🎯' : selectedGameType === 'memory' ? '🃏' : '🎭'} <br />
           {selectedGameType === 'guess' ? 'Quem Sou ' : selectedGameType === 'memory' ? 'Jogo da ' : 'Cara a '}
           <span style={{ color: 'var(--primary)', fontStyle: 'italic' }}>{selectedGameType === 'guess' ? 'Eu?' : selectedGameType === 'memory' ? 'Memória' : 'Cara'}</span>
         </h1>
-        <p className="text-sub">
+        <p className="text-sub" style={{ marginBottom: '16px' }}>
           {selectedGameType === 'guess' ? 'Jogo divertido em dupla' :
             selectedGameType === 'memory' ? 'Treine sua mente em dupla' :
               'Adivinhe quem seu amigo é!'}
         </p>
 
-        <div className="white-card" style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '32px' }}>
+        <div className="white-card" style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <input
               type="text"
@@ -417,20 +417,20 @@ export default function App() {
       <div className="child-container">
         <ScoreBoard game={game} isP1={isP1} p1Ready={!!game.player1_character} p2Ready={!!game.player2_character} />
 
-        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 900 }}>🎯 Seu personagem</h2>
+        <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 900 }}>🎯 Seu personagem</h2>
         </div>
 
         <div style={{ width: '100%' }}>
           {!game.player2_id ? (
-            <div className="white-card" style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '16px' }} className="animate-bounce">🎈</div>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 900 }}>ESPERE UM AMIGO</h3>
-              <p style={{ fontSize: '0.875rem', opacity: 0.5, fontWeight: 700, lineHeight: 1.6, padding: '16px 0' }}>
+            <div className="white-card" style={{ textAlign: 'center', padding: '1.5rem 1rem' }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '12px' }} className="animate-bounce">🎈</div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 900 }}>ESPERE UM AMIGO</h3>
+              <p style={{ fontSize: '0.75rem', opacity: 0.5, fontWeight: 700, lineHeight: 1.4, padding: '12px 0' }}>
                 Passe o código <br />
-                <span style={{ fontSize: '2rem', color: 'var(--primary)', fontWeight: 900, display: 'block', marginTop: '8px', letterSpacing: '4px' }}>{game.room_code}</span>
+                <span style={{ fontSize: '1.75rem', color: 'var(--primary)', fontWeight: 900, display: 'block', marginTop: '4px', letterSpacing: '2px' }}>{game.room_code}</span>
               </p>
-              <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.75rem', marginTop: '16px' }}>CANCELAR SALA 🚪</button>
+              <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.75rem', marginTop: '12px', height: '48px' }}>CANCELAR SALA 🚪</button>
             </div>
           ) : (
             <>
@@ -448,23 +448,23 @@ export default function App() {
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div className="white-card" style={{ textAlign: 'center' }}>
-                    <span className="badge">{isAllMode ? '🔥 MODO ALEATÓRIO' : activeCategory.name}</span>
+                  <div className="white-card" style={{ textAlign: 'center', padding: '1.5rem 1rem' }}>
+                    <span className="badge" style={{ marginBottom: '0.5rem' }}>{isAllMode ? '🔥 MODO ALEATÓRIO' : activeCategory.name}</span>
                     {rolling ? (
                       <SlotMachine target={selectedCharacter} categoryId={isAllMode ? 'all' : activeCategory.id} onFinish={() => setRolling(false)} />
                     ) : (
-                      <h3 className="text-hero" style={{ color: 'black', fontSize: '2.5rem' }}>{selectedCharacter}</h3>
+                      <h3 className="text-hero" style={{ color: 'black', fontSize: '2rem', margin: '0.5rem 0' }}>{selectedCharacter}</h3>
                     )}
                     {!rolling && (
-                      <button onClick={handleConfirmChoice} className="btn-puffy btn-blue" style={{ marginTop: '24px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>ESCOLHER ESTE! 🚀</button>
+                      <button onClick={handleConfirmChoice} className="btn-puffy btn-blue" style={{ marginTop: '16px', height: '54px', boxShadow: '0 8px 12px -3px rgba(0,0,0,0.1)' }}>ESCOLHER! 🚀</button>
                     )}
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                    <button onClick={() => sortear()} className="btn-puffy btn-light" style={{ fontSize: '0.75rem' }}><Dice5 size={18} /> OUTRO</button>
-                    <button onClick={trocarCategoria} className="btn-puffy btn-light" style={{ fontSize: '0.75rem' }}><RotateCcw size={18} /> LISTA</button>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
+                    <button onClick={() => sortear()} className="btn-puffy btn-light" style={{ fontSize: '0.7rem', height: '44px' }}><Dice5 size={16} /> OUTRO</button>
+                    <button onClick={trocarCategoria} className="btn-puffy btn-light" style={{ fontSize: '0.7rem', height: '44px' }}><RotateCcw size={16} /> LISTA</button>
                   </div>
-                  <button onClick={modoAleatorio} className="btn-puffy btn-purple" style={{ fontSize: '0.75rem' }}>🔥 MODO ALEATÓRIO TOTAL</button>
-                  <button onClick={exitRoom} className="btn-puffy btn-light" style={{ color: '#f43f5e', fontSize: '0.875rem', marginTop: '16px' }}>SAIR DA SALA 🚪</button>
+                  <button onClick={modoAleatorio} className="btn-puffy btn-purple" style={{ fontSize: '0.7rem', height: '44px', marginTop: '8px' }}>🔥 ALEATÓRIO TOTAL</button>
+                  <button onClick={exitRoom} className="btn-puffy btn-light" style={{ color: '#f43f5e', fontSize: '0.75rem', marginTop: '12px', height: '44px', background: 'none', boxShadow: 'none' }}>SAIR 🚪</button>
                 </div>
               )}
             </>
@@ -486,31 +486,31 @@ export default function App() {
       <div className="child-container">
         <ScoreBoard game={game} isP1={isP1} p1Ready={!!game.player1_character} p2Ready={!!game.player2_character} />
 
-        <div style={{ textAlign: 'center', marginBottom: '24px', width: '100%' }}>
-          <span className="badge" style={{ background: 'var(--primary)', color: 'white' }}>🎮 SEU AMIGO É...</span>
-          <div className="white-card">
-            <h2 style={{ fontWeight: 900, fontSize: '2.5rem', letterSpacing: '-0.025em' }}>{opponentChar}</h2>
-            <p style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', opacity: 0.3, marginTop: '8px' }}>Dê dicas para ele!</p>
+        <div style={{ textAlign: 'center', marginBottom: '16px', width: '100%' }}>
+          <span className="badge" style={{ background: 'var(--primary)', color: 'white', marginBottom: '0.5rem' }}>🎮 SEU AMIGO É...</span>
+          <div className="white-card" style={{ padding: '1rem' }}>
+            <h2 style={{ fontWeight: 900, fontSize: '2rem', letterSpacing: '-0.025em' }}>{opponentChar}</h2>
+            <p style={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', opacity: 0.3, marginTop: '4px' }}>Dê dicas para ele!</p>
           </div>
         </div>
 
-        <div style={{ textAlign: 'center', marginBottom: '32px', width: '100%' }}>
-          <span className="badge" style={{ background: 'var(--secondary)', color: 'white' }}>🤔 QUEM SURPRESA?</span>
-          <div className="white-card" style={{ padding: '40px 0' }}>
-            <div style={{ width: '64px', height: '64px', background: '#f8fafc', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-              <HelpCircle size={32} style={{ color: '#e2e8f0' }} className="animate-pulse" />
+        <div style={{ textAlign: 'center', marginBottom: '16px', width: '100%' }}>
+          <span className="badge" style={{ background: 'var(--secondary)', color: 'white', marginBottom: '0.5rem' }}>🤔 QUEM SURPRESA?</span>
+          <div className="white-card" style={{ padding: '20px 0' }}>
+            <div style={{ width: '48px', height: '48px', background: '#f8fafc', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px' }}>
+              <HelpCircle size={28} style={{ color: '#e2e8f0' }} className="animate-pulse" />
             </div>
-            <p style={{ fontSize: '10px', fontWeight: 900, opacity: 0.2, letterSpacing: '4px' }}>FAÇA PERGUNTAS!</p>
+            <p style={{ fontSize: '9px', fontWeight: 900, opacity: 0.2, letterSpacing: '2px' }}>FAÇA PERGUNTAS!</p>
           </div>
         </div>
 
-        <div style={{ marginTop: 'auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <button className="btn-puffy btn-purple" style={{ boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }} onClick={() => (confetti(), window.navigator.vibrate?.(50))}>
-            <Star size={24} fill="white" style={{ color: 'white' }} /> TIVE UMA IDEIA!
+        <div style={{ marginTop: 'auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <button className="btn-puffy btn-purple" style={{ height: '54px', boxShadow: '0 12px 16px -4px rgba(0,0,0,0.1)' }} onClick={() => (confetti(), window.navigator.vibrate?.(50))}>
+            <Star size={20} fill="white" style={{ color: 'white' }} /> TIVE UMA IDEIA!
           </button>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <button className="btn-puffy btn-rose" onClick={handleWin}>ACERTOU! 🎉</button>
-            <button className="btn-puffy btn-light" style={{ fontSize: '0.75rem' }} onClick={exitRoom}>SAIR 🚪</button>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            <button className="btn-puffy btn-rose" style={{ height: '54px' }} onClick={handleWin}>ACERTOU! 🎉</button>
+            <button className="btn-puffy btn-light" style={{ fontSize: '0.75rem', height: '54px' }} onClick={exitRoom}>SAIR 🚪</button>
           </div>
         </div>
       </div>
@@ -584,20 +584,20 @@ const CaraACaraSetup = ({ game, user, exitRoom }) => {
 
   return (
     <div className="child-container">
-      <div className="white-card shadow-lg" style={{ maxWidth: '400px', textAlign: 'center' }}>
-        <div style={{ fontSize: '5rem', marginBottom: '10px' }}>🎭</div>
-        <h2 className="text-hero" style={{ fontSize: '2rem' }}>CARA A CARA</h2>
-        <p className="text-sub">Adivinhe o personagem do seu amigo!</p>
+      <div className="white-card shadow-lg" style={{ maxWidth: '400px', textAlign: 'center', padding: '1.5rem 1rem' }}>
+        <div style={{ fontSize: '3.5rem', marginBottom: '8px' }}>🎭</div>
+        <h2 className="text-hero" style={{ fontSize: '1.5rem' }}>CARA A CARA</h2>
+        <p className="text-sub" style={{ marginBottom: '12px' }}>Adivinhe o personagem do seu amigo!</p>
 
         {!game.player2_id ? (
-          <div style={{ marginTop: '20px' }}>
-            <div className="room-code-box" onClick={() => navigator.clipboard.writeText(game.room_code)}>
+          <div style={{ marginTop: '12px' }}>
+            <div className="room-code-box" onClick={() => navigator.clipboard.writeText(game.room_code)} style={{ padding: '16px' }}>
               <span style={{ fontSize: '0.6rem', opacity: 0.4, display: 'block', fontWeight: 900 }}>CÓDIGO DA SALA</span>
-              <span className="text-hero" style={{ color: 'var(--primary)', letterSpacing: '6px', fontSize: '3rem' }}>{game.room_code}</span>
+              <span className="text-hero" style={{ color: 'var(--primary)', letterSpacing: '4px', fontSize: '2.5rem' }}>{game.room_code}</span>
               <span className="copy-hint text-primary">COPIAR 📋</span>
             </div>
-            <p className="text-sub">Aguardando seu amigo entrar...</p>
-            <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.75rem', marginTop: '16px' }}>CANCELAR SALA 🚪</button>
+            <p className="text-sub" style={{ marginTop: '10px' }}>Aguardando seu amigo entrar...</p>
+            <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.7rem', marginTop: '12px', height: '48px' }}>CANCELAR SALA 🚪</button>
           </div>
         ) : (
           <div style={{ marginTop: '20px' }}>
@@ -946,20 +946,20 @@ const MemoryGameSetup = ({ game, user, exitRoom }) => {
 
   return (
     <div className="child-container">
-      <div className="white-card shadow-lg" style={{ maxWidth: '400px', textAlign: 'center' }}>
-        <div style={{ fontSize: '5rem', marginBottom: '10px' }}>🃏</div>
-        <h2 className="text-hero" style={{ fontSize: '2rem' }}>JOGO DA MEMÓRIA</h2>
-        <p className="text-sub">Treine seu cérebro em dupla!</p>
+      <div className="white-card shadow-lg" style={{ maxWidth: '400px', textAlign: 'center', padding: '1.5rem 1rem' }}>
+        <div style={{ fontSize: '3.5rem', marginBottom: '8px' }}>🃏</div>
+        <h2 className="text-hero" style={{ fontSize: '1.5rem' }}>JOGO DA MEMÓRIA</h2>
+        <p className="text-sub" style={{ marginBottom: '12px' }}>Treine seu cérebro em dupla!</p>
 
         {!game.player2_id ? (
-          <div style={{ marginTop: '20px' }}>
-            <div className="room-code-box" onClick={handleCopy}>
-              <span style={{ fontSize: '0.6rem', opacity: 0.4, display: 'block', fontWeight: 900 }}>TOQUE PARA COPIAR O CÓDIGO</span>
-              <span className="text-hero" style={{ color: 'var(--primary)', letterSpacing: '6px', fontSize: '3rem' }}>{game.room_code}</span>
+          <div style={{ marginTop: '12px' }}>
+            <div className="room-code-box" onClick={handleCopy} style={{ padding: '16px' }}>
+              <span style={{ fontSize: '0.5rem', opacity: 0.4, display: 'block', fontWeight: 900 }}>TOQUE PARA COPIAR O CÓDIGO</span>
+              <span className="text-hero" style={{ color: 'var(--primary)', letterSpacing: '4px', fontSize: '2.5rem' }}>{game.room_code}</span>
               <span className="copy-hint text-primary">COPIAR 📋</span>
             </div>
-            <p className="text-sub" style={{ marginTop: '15px' }}>O jogo começará assim que seu amigo entrar.</p>
-            <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.75rem', marginTop: '16px' }}>CANCELAR SALA 🚪</button>
+            <p className="text-sub" style={{ marginTop: '10px' }}>O jogo começará assim que seu amigo entrar.</p>
+            <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.7rem', marginTop: '12px', height: '44px' }}>CANCELAR SALA 🚪</button>
           </div>
         ) : (
           <div style={{ marginTop: '20px' }}>
@@ -1149,9 +1149,9 @@ const MemoryGame = ({ game, user, exitRoom }) => {
         ))}
       </div>
 
-      <div className="overall-progress">
-        <span style={{ fontSize: '0.65rem', fontWeight: 900, color: '#94a3b8' }}>{matchedCount} DE {totalPairs} PARES ENCONTRADOS</span>
-        <div className="progress-track">
+      <div className="overall-progress" style={{ marginTop: '16px' }}>
+        <span style={{ fontSize: '0.6rem', fontWeight: 900, color: '#94a3b8' }}>{matchedCount} DE {totalPairs} PARES ENCONTRADOS</span>
+        <div className="progress-track" style={{ height: '4px' }}>
           <div className="progress-fill" style={{ width: `${progressPercent}%` }}></div>
         </div>
       </div>
