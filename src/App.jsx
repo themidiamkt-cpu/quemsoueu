@@ -18,16 +18,6 @@ import LoginScreen from './screens/LoginScreen';
 
 // --- DECORATIVE COMPONENTS ---
 
-const FloatingDecor = () => (
-  <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-    <div className="floating-decor float-slow top-10 left-10 text-rose-300"><Star size={40} /></div>
-    <div className="floating-decor float-fast top-1/4 right-20 text-blue-300"><Gamepad2 size={32} /></div>
-    <div className="floating-decor float-slow bottom-20 left-1/4 text-purple-300"><Gamepad2 size={48} /></div>
-    <div className="floating-decor float-fast bottom-40 right-10 text-rose-200"><Star size={24} /></div>
-    <div className="floating-decor float-slow top-20 right-1/3 text-sky-200"><Star size={30} fill="currentColor" /></div>
-  </div>
-);
-
 const SlotMachine = ({ target, categoryId, onFinish }) => {
   const [names, setNames] = useState([]);
 
@@ -62,21 +52,26 @@ const SlotMachine = ({ target, categoryId, onFinish }) => {
 
 const ScoreBoard = ({ game, isP1 }) => {
   const scores = game.scores || { p1: 0, p2: 0 };
+  const p1Name = game.player1_name || 'Jogador 1';
+  const p2Name = game.player2_name || 'Jogador 2';
 
   return (
-    <div className="flex justify-center gap-3 mb-6 relative z-10 w-full px-2">
-      <div className="bg-white flex-1 py-3 px-2 rounded-2xl shadow-puffy border-2 border-primary/10 flex flex-col items-center justify-center min-w-0">
-        <span className="text-[10px] font-black text-black opacity-30 uppercase truncate w-full text-center">
-          {isP1 ? (game.player1_name || 'VOCÊ') : (game.player2_name || 'VOCÊ')}
-        </span>
-        <span className="text-2xl font-black text-primary leading-none mt-1">{isP1 ? scores.p1 : scores.p2}</span>
+    <div className="bg-white rounded-2xl shadow-puffy border-2 border-slate-100 flex overflow-hidden mb-6 relative z-10 mx-2">
+      <div className="flex-1 py-4 px-2 text-center border-r border-slate-50 min-w-0">
+        <div className="text-[10px] font-black text-slate-400 uppercase truncate px-1">
+          {isP1 ? p1Name : p2Name}
+        </div>
+        <div className="text-3xl font-black text-primary leading-none mt-1">
+          {isP1 ? scores.p1 : scores.p2}
+        </div>
       </div>
-
-      <div className="bg-white flex-1 py-3 px-2 rounded-2xl shadow-puffy border-2 border-secondary/10 flex flex-col items-center justify-center min-w-0">
-        <span className="text-2xl font-black text-secondary leading-none">{isP1 ? scores.p2 : scores.p1}</span>
-        <span className="text-[10px] font-black text-black opacity-30 uppercase truncate w-full text-center mt-1">
-          {isP1 ? (game.player2_name || 'AMIGO') : (game.player1_name || 'AMIGO')}
-        </span>
+      <div className="flex-1 py-4 px-2 text-center min-w-0">
+        <div className="text-3xl font-black text-secondary leading-none">
+          {isP1 ? scores.p2 : scores.p1}
+        </div>
+        <div className="text-[10px] font-black text-slate-400 uppercase truncate px-1 mt-1">
+          {isP1 ? p2Name : p1Name}
+        </div>
       </div>
     </div>
   );
@@ -163,7 +158,7 @@ export default function App() {
     const currentScores = game.scores || { p1: 0, p2: 0 };
     const newScores = {
       ...currentScores,
-      [isP1 ? 'p1' : 'p2']: (currentScores[isP1 ? 'p1' : 'p2'] || 0) + 1
+      [isP1 ? 'p2' : 'p1']: (currentScores[isP1 ? 'p2' : 'p1'] || 0) + 1
     };
 
     // Reset game but keep scores
@@ -186,7 +181,6 @@ export default function App() {
 
   const renderLobby = () => (
     <div className="child-container">
-      <FloatingDecor />
 
       <div className="text-center relative z-10">
         <h1 className="text-hero text-black">
@@ -267,7 +261,6 @@ export default function App() {
 
     return (
       <div className="child-container">
-        <FloatingDecor />
         <ScoreBoard game={game} isP1={isP1} />
 
         <div className="flex justify-between items-center mb-6 relative z-10">
@@ -342,9 +335,9 @@ export default function App() {
                     🔥 MODO ALEATÓRIO TOTAL
                   </button>
 
-                  <div className="pt-4 border-t border-slate-50 mt-4">
-                    <button onClick={exitRoom} className="text-[10px] font-black text-rose-500 opacity-60 hover:opacity-100 uppercase tracking-widest transition-opacity">
-                      Sair da Sala 🚪
+                  <div className="pt-6 border-t border-slate-50 mt-6">
+                    <button onClick={exitRoom} className="btn-puffy btn-light text-rose-500 text-sm">
+                      SAIR DA SALA 🚪
                     </button>
                   </div>
                 </div>
@@ -368,7 +361,6 @@ export default function App() {
 
     return (
       <div className="child-container">
-        <FloatingDecor />
         <ScoreBoard game={game} isP1={isP1} />
 
         <div className="text-center mb-6 relative z-10">
@@ -395,7 +387,7 @@ export default function App() {
           </button>
           <div className="grid grid-cols-2 gap-4">
             <button className="btn-puffy btn-rose text-white h-16" onClick={handleWin}>
-              ACERTEI! 🎉
+              ACERTOU! 🎉
             </button>
             <button className="btn-puffy btn-light h-16 text-xs" onClick={exitRoom}>
               SAIR 🚪
