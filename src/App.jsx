@@ -754,118 +754,126 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
     { attribute: 'chapeu', value: true, label: '🎩 Chapéu?', emoji: '🎩' },
   ];
 
-  const suggestionCount = board.filter(c => !myEliminations.includes(c.name) && getSuggestion(c) === 'eliminate').length;
+  return (
+    <div className="child-container">
+      <ScoreBoard game={game} isP1={isP1} p1Ready={true} p2Ready={true} />
 
-        </div >
-
-  <div className={`turn-badge ${myTurn ? 'active' : 'waiting'}`} style={{ marginBottom: '8px' }}>
-    {myTurn ? '👉 SEU TURNO! PERGUNTE 👀' : '⌛ ESPERE O AMIGO...'}
-  </div>
-
-{
-  waitingForAnswer && (
-    <div className="answer-box-meta">
-      {myTurn ? (
-        <p className="text-sub">VOCÊ PERGUNTOU: <br /><strong style={{ color: 'var(--primary)', fontSize: '1.2rem' }}>{isP1 ? game.board_state.p1_question?.label : game.board_state.p2_question?.label}</strong><br />Aguardando...</p>
-      ) : (
+      <div className="secret-card-meta">
+        <div style={{ fontSize: '2rem' }}>{mySecret?.avatar}</div>
         <div>
-          <p className="text-sub">ELE PERGUNTOU: <br /><strong style={{ color: 'var(--secondary)', fontSize: '1.2rem' }}>{currentQuestionData?.label}</strong></p>
-          <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-            <button onClick={() => handleAnswer(true)} className="btn-puffy btn-green" style={{ flex: 1 }}>SIM ✅</button>
-            <button onClick={() => handleAnswer(false)} className="btn-puffy btn-rose" style={{ flex: 1 }}>NÃO ❌</button>
+          <p className="secret-label">SEU PERSONAGEM SECRETO:</p>
+          <p className="secret-name">{mySecret?.name}</p>
+        </div>
+      </div>
+
+      <div className={`turn-badge ${myTurn ? 'active' : 'waiting'}`} style={{ marginBottom: '8px' }}>
+        {myTurn ? '👉 SEU TURNO! PERGUNTE 👀' : '⌛ ESPERE O AMIGO...'}
+      </div>
+
+      {
+        waitingForAnswer && (
+          <div className="answer-box-meta">
+            {myTurn ? (
+              <p className="text-sub">VOCÊ PERGUNTOU: <br /><strong style={{ color: 'var(--primary)', fontSize: '1.2rem' }}>{isP1 ? game.board_state.p1_question?.label : game.board_state.p2_question?.label}</strong><br />Aguardando...</p>
+            ) : (
+              <div>
+                <p className="text-sub">ELE PERGUNTOU: <br /><strong style={{ color: 'var(--secondary)', fontSize: '1.2rem' }}>{currentQuestionData?.label}</strong></p>
+                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                  <button onClick={() => handleAnswer(true)} className="btn-puffy btn-green" style={{ flex: 1 }}>SIM ✅</button>
+                  <button onClick={() => handleAnswer(false)} className="btn-puffy btn-rose" style={{ flex: 1 }}>NÃO ❌</button>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
-    </div>
-  )
-}
+        )
+      }
 
-{
-  suggestionCount > 0 && !myTurn && (
-    <div className="suggestion-panel animate-pulse">
-      <p style={{ fontWeight: 900, color: 'white', fontSize: '0.8rem' }}>💡 VOCÊ PODE ELIMINAR {suggestionCount} PERSONAGENS!</p>
-      <button onClick={handleBatchEliminate} className="btn-puffy btn-white" style={{ scale: '0.8', marginTop: '4px' }}>ELIMINAR SUGERIDOS 🪄</button>
-    </div>
-  )
-}
+      {
+        suggestionCount > 0 && !myTurn && (
+          <div className="suggestion-panel animate-pulse">
+            <p style={{ fontWeight: 900, color: 'white', fontSize: '0.8rem' }}>💡 VOCÊ PODE ELIMINAR {suggestionCount} PERSONAGENS!</p>
+            <button onClick={handleBatchEliminate} className="btn-puffy btn-white" style={{ scale: '0.8', marginTop: '4px' }}>ELIMINAR SUGERIDOS 🪄</button>
+          </div>
+        )
+      }
 
-{
-  isChoosingGuess && (
-    <div className="guess-hint">
-      👉 TOQUE NO PERSONAGEM FINAL!
-    </div>
-  )
-}
+      {
+        isChoosingGuess && (
+          <div className="guess-hint">
+            👉 TOQUE NO PERSONAGEM FINAL!
+          </div>
+        )
+      }
 
-        <div className="face-grid-meta">
-          {board.map((char, i) => {
-            const suggestion = getSuggestion(char);
-            const eliminated = myEliminations.includes(char.name);
-            return (
-              <div
-                key={i}
-                className={`face-card-meta ${eliminated ? 'eliminated' : ''} ${suggestion === 'eliminate' ? 'suggest-red' : suggestion === 'keep' ? 'suggest-green' : ''} ${isChoosingGuess ? 'pulse' : ''}`}
-                onClick={() => toggleEliminate(char.name)}
-              >
-                <div className="face-avatar">{char.avatar}</div>
-                <div className="face-name">{char.name}</div>
-                {suggestion === 'eliminate' && !eliminated && <div className="suggestion-badge">❌</div>}
-                {suggestion === 'keep' && !eliminated && <div className="suggestion-badge-keep">✅</div>}
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="question-panel-meta">
-          {myTurn && !waitingForAnswer && !isChoosingGuess && (
-            <div className="btn-grid-questions">
-              {questions.map((q, idx) => (
-                <button key={idx} onClick={() => handleAsk(q)} className="quick-btn-meta">
-                  {q.label}
-                </button>
-              ))}
-              <div style={{ gridColumn: 'span 2', display: 'flex', gap: '4px', marginTop: '4px' }}>
-                <input
-                  type="text"
-                  className="input-child-mini"
-                  placeholder="Pergunta livre..."
-                  value={freeQuestion}
-                  onChange={e => setFreeQuestion(e.target.value)}
-                  onKeyPress={e => e.key === 'Enter' && freeQuestion.trim() && handleAsk({ attribute: 'custom', value: freeQuestion, label: `❓ ${freeQuestion}` })}
-                />
-                <button
-                  onClick={() => freeQuestion.trim() && handleAsk({ attribute: 'custom', value: freeQuestion, label: `❓ ${freeQuestion}` })}
-                  className="btn-puffy btn-blue"
-                  style={{ width: '44px', height: '36px', padding: 0 }}
-                >🚀</button>
-              </div>
-            </div>
-          )}
-
-          {isChoosingGuess ? (
-            <button className="btn-puffy btn-light" onClick={() => setIsChoosingGuess(false)}>CANCELAR ↩️</button>
-          ) : (
-            <button
-              className="btn-puffy btn-purple"
-              disabled={!myTurn || waitingForAnswer}
-              style={{ opacity: (!myTurn || waitingForAnswer) ? 0.5 : 1, width: '100%' }}
-              onClick={() => setIsChoosingGuess(true)}
+      <div className="face-grid-meta">
+        {board.map((char, i) => {
+          const suggestion = getSuggestion(char);
+          const eliminated = myEliminations.includes(char.name);
+          return (
+            <div
+              key={i}
+              className={`face-card-meta ${eliminated ? 'eliminated' : ''} ${suggestion === 'eliminate' ? 'suggest-red' : suggestion === 'keep' ? 'suggest-green' : ''} ${isChoosingGuess ? 'pulse' : ''}`}
+              onClick={() => toggleEliminate(char.name)}
             >
-              👉 ACHO QUE É...
-            </button>
-          )}
+              <div className="face-avatar">{char.avatar}</div>
+              <div className="face-name">{char.name}</div>
+              {suggestion === 'eliminate' && !eliminated && <div className="suggestion-badge">❌</div>}
+              {suggestion === 'keep' && !eliminated && <div className="suggestion-badge-keep">✅</div>}
+            </div>
+          );
+        })}
+      </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
-            <button onClick={() => {
-              const key = isP1 ? 'p1_eliminated' : 'p2_eliminated';
-              updateGame(game.id, { board_state: { ...game.board_state, [key]: [] } });
-            }} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#94a3b8' }}>RESETAR 🔄</button>
-            <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#f43f5e' }}>SAIR 🚪</button>
+      <div className="question-panel-meta">
+        {myTurn && !waitingForAnswer && !isChoosingGuess && (
+          <div className="btn-grid-questions">
+            {questions.map((q, idx) => (
+              <button key={idx} onClick={() => handleAsk(q)} className="quick-btn-meta">
+                {q.label}
+              </button>
+            ))}
+            <div style={{ gridColumn: 'span 2', display: 'flex', gap: '4px', marginTop: '4px' }}>
+              <input
+                type="text"
+                className="input-child-mini"
+                placeholder="Pergunta livre..."
+                value={freeQuestion}
+                onChange={e => setFreeQuestion(e.target.value)}
+                onKeyPress={e => e.key === 'Enter' && freeQuestion.trim() && handleAsk({ attribute: 'custom', value: freeQuestion, label: `❓ ${freeQuestion}` })}
+              />
+              <button
+                onClick={() => freeQuestion.trim() && handleAsk({ attribute: 'custom', value: freeQuestion, label: `❓ ${freeQuestion}` })}
+                className="btn-puffy btn-blue"
+                style={{ width: '44px', height: '36px', padding: 0 }}
+              >🚀</button>
+            </div>
           </div>
+        )}
+
+        {isChoosingGuess ? (
+          <button className="btn-puffy btn-light" onClick={() => setIsChoosingGuess(false)}>CANCELAR ↩️</button>
+        ) : (
+          <button
+            className="btn-puffy btn-purple"
+            disabled={!myTurn || waitingForAnswer}
+            style={{ opacity: (!myTurn || waitingForAnswer) ? 0.5 : 1, width: '100%' }}
+            onClick={() => setIsChoosingGuess(true)}
+          >
+            👉 ACHO QUE É...
+          </button>
+        )}
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
+          <button onClick={() => {
+            const key = isP1 ? 'p1_eliminated' : 'p2_eliminated';
+            updateGame(game.id, { board_state: { ...game.board_state, [key]: [] } });
+          }} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#94a3b8' }}>RESETAR 🔄</button>
+          <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#f43f5e' }}>SAIR 🚪</button>
         </div>
-      </div >
-    );
-  };
+      </div>
+    </div >
+  );
+};
 
 
 // --- MEMORY GAME COMPONENTS ---
