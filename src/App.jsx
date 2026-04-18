@@ -787,8 +787,8 @@ const MemoryGame = ({ game, user, exitRoom }) => {
         </div>
       </div>
 
-      <div style={{ padding: '40px 0', width: '100%', display: 'flex', justifyContent: 'center' }}>
-        <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.75rem', color: '#94a3b8', background: 'transparent', boxShadow: 'none' }}>SAIR DO JOGO 🚪</button>
+      <div style={{ padding: '20px 0', width: '100%', display: 'flex', justifyContent: 'center' }}>
+        <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.75rem', color: '#94a3b8', background: 'transparent', border: 'none', boxShadow: 'none' }}>SAIR DO JOGO 🚪</button>
       </div>
     </div>
   );

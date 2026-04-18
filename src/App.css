@@ -23,8 +23,10 @@
 
 .child-container {
   min-height: 100vh;
+  /* Use dvh for better mobile support */
+  min-height: 100dvh;
   width: 100%;
-  padding: 20px;
+  padding: 16px;
   background: var(--bg-gradient);
   display: flex;
   flex-direction: column;
@@ -58,10 +60,15 @@
   perspective: 1200px;
 }
 
-@media (max-width: 400px) {
+@media (max-width: 450px) {
   .memory-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin: 10px auto;
+  }
+
+  .card-emoji {
+    font-size: 1.8rem;
   }
 }
 
@@ -167,7 +174,7 @@
   height: 8px;
   background: #e2e8f0;
   border-radius: 10px;
-  margin: 16px 0;
+  margin: 10px 0;
   overflow: hidden;
   position: relative;
 }
@@ -186,7 +193,7 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   transition: all 0.3s;
 }
 
