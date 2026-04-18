@@ -58,29 +58,46 @@ const PlayerAvatar = ({ name, colorIndex = 0, isActive }) => {
     'linear-gradient(135deg, #10b981 0%, #059669 100%)'
   ];
   const initial = (name || '?').charAt(0).toUpperCase();
-  const colors = ['#fb7185', '#38bdf8', '#8b5cf6', '#fbbf24', '#10b981'];
+  const gradients = [
+    'linear-gradient(135deg, #fb7185 0%, #e11d48 100%)',
+    'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)',
+    'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
+    'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)',
+    'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+  ];
+
+  // Helper to get Twemoji SVG URL for an emoji
+  const getAvatarUrl = (emoji) => {
+    if (!emoji || emoji.startsWith('http')) return emoji;
+    const codes = [...emoji].map(c => c.codePointAt(0).toString(16)).join('-');
+    // Special handling for some combined emojis if needed, but standard ZWJ usually works
+    return `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${codes}.svg`;
+  };
+
+  const initial = (name || '?').charAt(0).toUpperCase();
+  const bgGradient = gradients[colorIndex % gradients.length];
 
   return (
-    <div style={{
-      width: '40px',
-      height: '40px',
-      borderRadius: '50%',
-      background: isActive ? colors[colorIndex] : '#e2e8f0',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontWeight: 'bold',
-      color: 'white',
-      boxShadow: isActive ? `0 0 15px ${colors[colorIndex]}44` : 'none',
-      transition: 'all 0.3s ease',
-      border: isActive ? '2.5px solid white' : '2.5px solid transparent',
-      flexShrink: 0,
-      overflow: 'hidden'
-    }}>
+    <div
+      className={`avatar ${isActive ? 'active' : ''}`}
+      style={{
+        background: bgGradient,
+        width: '40px',
+        height: '40px',
+        borderRadius: '16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: '2px solid white',
+        boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+        flexShrink: 0,
+        overflow: 'hidden'
+      }}
+    >
       {name ? (
-        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${name}&backgroundColor=transparent`} alt={name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        <img src={getAvatarUrl(initial ? initial : '?')} alt={name} style={{ width: '60%', height: '60%', objectFit: 'contain' }} />
       ) : (
-        <div style={{ fontSize: '1.25rem' }}>?</div>
+        <span style={{ color: 'white', fontWeight: 900, fontSize: '0.8rem' }}>{initial}</span>
       )}
     </div>
   );
@@ -767,13 +784,20 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
 
   const suggestionCount = board.filter(c => !myEliminations.includes(c.name) && getSuggestion(c) === 'eliminate').length;
 
+  // Helper to get Twemoji SVG URL for an emoji
+  const getAvatarUrl = (emoji) => {
+    if (!emoji || emoji.startsWith('http')) return emoji;
+    const codes = [...emoji].map(c => c.codePointAt(0).toString(16)).filter(c => c !== 'fe0f').join('-');
+    return `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${codes}.svg`;
+  };
+
   return (
     <div className="child-container">
       <ScoreBoard game={game} isP1={isP1} p1Ready={true} p2Ready={true} />
 
       <div className="secret-card-meta">
-        <div style={{ width: '48px', height: '48px', borderRadius: '12px', overflow: 'hidden', background: '#f8fafc' }}>
-          <img src={mySecret?.avatar} alt={mySecret?.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        <div style={{ width: '56px', height: '56px', borderRadius: '14px', overflow: 'hidden', background: 'rgba(255,255,255,0.8)', padding: '6px' }}>
+          <img src={getAvatarUrl(mySecret?.avatar)} alt={mySecret?.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
         <div>
           <p className="secret-label">SEU PERSONAGEM SECRETO:</p>
@@ -830,8 +854,8 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
               className={`face-card-meta ${eliminated ? 'eliminated' : ''} ${suggestion === 'eliminate' ? 'suggest-red' : suggestion === 'keep' ? 'suggest-green' : ''} ${isChoosingGuess ? 'pulse' : ''}`}
               onClick={() => toggleEliminate(char.name)}
             >
-              <div className="face-avatar" style={{ overflow: 'hidden', background: '#f8fafc', borderRadius: '12px' }}>
-                <img src={char.avatar} alt={char.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              <div className="face-avatar" style={{ padding: '6px' }}>
+                <img src={getAvatarUrl(char.avatar)} alt={char.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
               <div className="face-name">{char.name}</div>
               {suggestion === 'eliminate' && !eliminated && <div className="suggestion-badge">❌</div>}
