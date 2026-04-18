@@ -35,4 +35,29 @@ export const characterBank = {
     'Ben 10', 'Gumball', 'Darwin', 'Ladybug', 'Cat Noir', 'Bluey', 'Bingo', 'Peppa Pig', 'George Pig', 'Hello Kitty'
   ]
 };
-
+export const faceCharacters = [
+  { id: 1, name: 'Bernardo', avatar: '🧔', genero: 'masculino', oculos: false, cabelo: 'preto', cabelo_tipo: 'curto', barba: true, chapeu: false },
+  { id: 2, name: 'Ana', avatar: '👩‍🦰', genero: 'feminino', oculos: false, cabelo: 'ruivo', cabelo_tipo: 'longo', barba: false, chapeu: false },
+  { id: 3, name: 'Carlos', avatar: '👨‍🏫', genero: 'masculino', oculos: true, cabelo: 'castanho', cabelo_tipo: 'curto', barba: false, chapeu: false },
+  { id: 4, name: 'Daniela', avatar: '👱‍♀️', genero: 'feminino', oculos: false, cabelo: 'loiro', cabelo_tipo: 'longo', barba: false, chapeu: false },
+  { id: 5, name: 'Eduardo', avatar: '👨‍🌾', genero: 'masculino', oculos: false, cabelo: 'castanho', cabelo_tipo: 'curto', barba: true, chapeu: true },
+  { id: 6, name: 'Fernanda', avatar: '👩‍💼', genero: 'feminino', oculos: true, cabelo: 'preto', cabelo_tipo: 'longo', barba: false, chapeu: false },
+  { id: 7, name: 'Gabriel', avatar: '👲', genero: 'masculino', oculos: false, cabelo: 'preto', cabelo_tipo: 'curto', barba: false, chapeu: true },
+  { id: 8, name: 'Helena', avatar: '👧', genero: 'feminino', oculos: false, cabelo: 'castanho', cabelo_tipo: 'longo', barba: false, chapeu: true },
+  { id: 9, name: 'Igor', avatar: '👴', genero: 'masculino', oculos: false, cabelo: 'branco', cabelo_tipo: 'curto', barba: false, chapeu: false },
+  { id: 10, name: 'Julia', avatar: '👱‍♀️', genero: 'feminino', oculos: false, cabelo: 'preto', cabelo_tipo: 'longo', barba: false, chapeu: false },
+  { id: 11, name: 'Kevin', avatar: '👱‍♂️', genero: 'masculino', oculos: false, cabelo: 'loiro', cabelo_tipo: 'curto', barba: false, chapeu: false },
+  { id: 12, name: 'Larissa', avatar: '🕶️', genero: 'feminino', oculos: true, cabelo: 'loiro', cabelo_tipo: 'curto', barba: false, chapeu: false },
+  { id: 13, name: 'Mateus', avatar: '🎅', genero: 'masculino', oculos: false, cabelo: 'preto', cabelo_tipo: 'curto', barba: true, chapeu: true },
+  { id: 14, name: 'Nathalia', avatar: '🧕', genero: 'feminino', oculos: false, cabelo: 'preto', cabelo_tipo: 'longo', barba: false, chapeu: true },
+  { id: 15, name: 'Otavio', avatar: '🤵', genero: 'masculino', oculos: false, cabelo: 'preto', cabelo_tipo: 'curto', barba: false, chapeu: false },
+  { id: 16, name: 'Paula', avatar: '👷‍♀️', genero: 'feminino', oculos: false, cabelo: 'castanho', cabelo_tipo: 'curto', barba: false, chapeu: true },
+  { id: 17, name: 'Quirino', avatar: '👨‍🦳', genero: 'masculino', oculos: true, cabelo: 'branco', cabelo_tipo: 'curto', barba: true, chapeu: false },
+  { id: 18, name: 'Rosa', avatar: '👵', genero: 'feminino', oculos: true, cabelo: 'branco', cabelo_tipo: 'curto', barba: false, chapeu: false },
+  { id: 19, name: 'Samuel', avatar: '🤠', genero: 'masculino', oculos: false, cabelo: 'castanho', cabelo_tipo: 'curto', barba: false, chapeu: true },
+  { id: 20, name: 'Tatiana', avatar: '👩‍🦱', genero: 'feminino', oculos: false, cabelo: 'preto', cabelo_tipo: 'longo', barba: false, chapeu: false },
+  { id: 21, name: 'Uriel', avatar: '👨‍🦲', genero: 'masculino', oculos: false, cabelo: 'careca', cabelo_tipo: 'curto', barba: false, chapeu: false },
+  { id: 22, name: 'Vitoria', avatar: '👩‍🎓', genero: 'feminino', oculos: false, cabelo: 'ruivo', cabelo_tipo: 'curto', barba: false, chapeu: false },
+  { id: 23, name: 'Wagner', avatar: '🧔‍♂️', genero: 'masculino', oculos: true, cabelo: 'preto', cabelo_tipo: 'curto', barba: true, chapeu: false },
+  { id: 24, name: 'Xuxa', avatar: '👩‍🎤', genero: 'feminino', oculos: false, cabelo: 'loiro', cabelo_tipo: 'longo', barba: false, chapeu: false }
+];

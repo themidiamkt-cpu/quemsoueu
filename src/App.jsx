@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import { useGame } from './hooks/useGame';
-import { categories, characterBank } from './data/characters';
+import { categories, characterBank, faceCharacters } from './data/characters';
 import LoginScreen from './screens/LoginScreen';
 import './App.css';
 
@@ -549,12 +549,12 @@ export default function App() {
 
 const CaraACaraSetup = ({ game, user, exitRoom }) => {
   const { updateGame } = useGame();
-  const [selectedCategory, setSelectedCategory] = useState('kids');
+  const [isKidsMode, setIsKidsMode] = useState(false);
 
   const handleStart = async () => {
     try {
-      const pool = characterBank[selectedCategory] || characterBank['kids'];
-      const shuffled = [...pool].sort(() => 0.5 - Math.random());
+      // Pick 12 random characters from the rich set
+      const shuffled = [...faceCharacters].sort(() => 0.5 - Math.random());
       const selected = shuffled.slice(0, 12);
 
       const p1Secret = selected[Math.floor(Math.random() * selected.length)];
@@ -570,7 +570,9 @@ const CaraACaraSetup = ({ game, user, exitRoom }) => {
           p2_eliminated: [],
           p1_question: null,
           p2_question: null,
-          waiting_for_answer: false
+          waiting_for_answer: false,
+          is_kids_mode: isKidsMode,
+          last_answer: null // { attribute: 'oculos', value: true, result: true }
         },
         current_turn: 'p1'
       });
@@ -614,15 +616,15 @@ const CaraACaraSetup = ({ game, user, exitRoom }) => {
 
             {game.player1_id === user.id ? (
               <div style={{ marginTop: '24px' }}>
-                <p style={{ fontSize: '0.8rem', fontWeight: 900, marginBottom: '12px', opacity: 0.5 }}>ESCOLHA A CATEGORIA:</p>
-                <div className="category-row" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
-                  {categories.map(cat => (
-                    <button key={cat.id} onClick={() => setSelectedCategory(cat.id)} className={`cat-btn ${selectedCategory === cat.id ? 'active' : ''}`}>
-                      <span style={{ fontSize: '1.2rem', display: 'block' }}>{cat.name.split(' ')[0]}</span>
-                      <span style={{ fontSize: '0.6rem', fontWeight: 900 }}>{cat.name.split(' ')[1]}</span>
-                    </button>
-                  ))}
+                <div style={{ marginBottom: '24px' }}>
+                  <p style={{ fontSize: '0.8rem', fontWeight: 900, marginBottom: '12px', opacity: 0.5 }}>OPÇÕES:</p>
+                  <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', background: isKidsMode ? 'var(--mint-light)' : '#f8fafc', padding: '12px', borderRadius: '15px', border: `2px solid ${isKidsMode ? 'var(--mint)' : '#e2e8f0'}`, transition: 'all 0.3s' }}>
+                    <input type="checkbox" checked={isKidsMode} onChange={e => setIsKidsMode(e.target.checked)} style={{ width: '20px', height: '20px' }} />
+                    <span style={{ fontSize: '0.9rem', fontWeight: 900 }}>🧸 MODO INFANTIL</span>
+                  </label>
+                  <p style={{ fontSize: '0.6rem', marginTop: '8px', opacity: 0.5 }}>Atributos simplificados para crianças</p>
                 </div>
+
                 <button onClick={handleStart} className="btn-puffy btn-green">
                   COMEÇAR AGORA! 🚀
                 </button>
@@ -649,9 +651,10 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
   const board = game.board_state?.characters || [];
   const myEliminations = isP1 ? (game.board_state?.p1_eliminated || []) : (game.board_state?.p2_eliminated || []);
   const waitingForAnswer = game.board_state?.waiting_for_answer;
-  const currentQuestion = isP1 ? game.board_state?.p2_question : game.board_state?.p1_question;
+  const currentQuestionData = isP1 ? game.board_state?.p2_question : game.board_state?.p1_question;
+  const isKidsMode = game.board_state?.is_kids_mode;
+  const lastAnswer = game.board_state?.last_answer;
 
-  const [freeQuestion, setFreeQuestion] = useState('');
   const [isChoosingGuess, setIsChoosingGuess] = useState(false);
 
   const toggleEliminate = (name) => {
@@ -665,42 +668,61 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
 
     const key = isP1 ? 'p1_eliminated' : 'p2_eliminated';
     updateGame(game.id, {
-      board_state: {
-        ...game.board_state,
-        [key]: newList
-      }
+      board_state: { ...game.board_state, [key]: newList }
     });
   };
 
-  const handleAsk = async (question) => {
-    if (!myTurn || waitingForAnswer || !question.trim()) return;
+  const handleAsk = async (questionObj) => {
+    if (!myTurn || waitingForAnswer) return;
     const key = isP1 ? 'p1_question' : 'p2_question';
     await updateGame(game.id, {
       board_state: {
         ...game.board_state,
-        [key]: question.trim(),
-        waiting_for_answer: true
+        [key]: questionObj,
+        waiting_for_answer: true,
+        last_answer: null // Clear previous suggestion when asking new one
       }
     });
-    setFreeQuestion('');
   };
 
-  const handleAnswer = async (answer) => {
+  const handleAnswer = async (result) => {
     if (myTurn || !waitingForAnswer) return;
+    const question = isP1 ? game.board_state.p2_question : game.board_state.p1_question;
+
     await updateGame(game.id, {
       current_turn: game.current_turn === 'p1' ? 'p2' : 'p1',
       board_state: {
         ...game.board_state,
         p1_question: null,
         p2_question: null,
-        waiting_for_answer: false
+        waiting_for_answer: false,
+        last_answer: { ...question, result }
       }
+    });
+  };
+
+  const handleBatchEliminate = async () => {
+    if (!lastAnswer) return;
+    const toEliminate = board
+      .filter(char => {
+        if (myEliminations.includes(char.name)) return false;
+        const suggestion = getSuggestion(char);
+        return suggestion === 'eliminate';
+      })
+      .map(c => c.name);
+
+    if (toEliminate.length === 0) return;
+
+    const newList = [...myEliminations, ...toEliminate];
+    const key = isP1 ? 'p1_eliminated' : 'p2_eliminated';
+    await updateGame(game.id, {
+      board_state: { ...game.board_state, [key]: newList }
     });
   };
 
   const handleGuess = async (name) => {
     const opponentSecret = isP1 ? game.board_state?.p2_secret : game.board_state?.p1_secret;
-    if (name === opponentSecret) {
+    if (name === opponentSecret.name) {
       confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
       alert(`🎉 PARABÉNS! Você acertou! O personagem era ${name}!`);
       const newScores = { ...game.scores };
@@ -712,27 +734,57 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
       });
     } else {
       alert(`❌ QUE PENA! Não era o ${name}. Perdeu a vez!`);
-      // Optionally penalize by skipping turn correctly
       setIsChoosingGuess(false);
       await updateGame(game.id, {
         current_turn: game.current_turn === 'p1' ? 'p2' : 'p1',
-        board_state: {
-          ...game.board_state,
-          waiting_for_answer: false
-        }
+        board_state: { ...game.board_state, waiting_for_answer: false, last_answer: null }
       });
     }
   };
+
+  const getSuggestion = (char) => {
+    if (!lastAnswer || myTurn) return null; // Only show suggestions if it's NOT my turn (meaning I just got the answer)
+    // Wait, if it's NOT my turn now, it means it WAS my turn when I asked.
+    // So if game.current_turn !== my role, then I'm the one who should see the suggestions.
+    const wasMyTurn = (game.current_turn === 'p1' && !isP1) || (game.current_turn === 'p2' && isP1);
+    if (!wasMyTurn) return null;
+
+    const { attribute, value, result } = lastAnswer;
+    const hasAttr = char[attribute] === value;
+    if (result === true) {
+      return hasAttr ? 'keep' : 'eliminate';
+    } else {
+      return hasAttr ? 'eliminate' : 'keep';
+    }
+  };
+
+  const questions = [
+    { attribute: 'oculos', value: true, label: '👓 Óculos?', emoji: '👓' },
+    { attribute: 'genero', value: 'masculino', label: '👨 Homem?', emoji: '👨' },
+    { attribute: 'genero', value: 'feminino', label: '👩 Mulher?', emoji: '👩' },
+    { attribute: 'chapeu', value: true, label: '🎩 Chapéu?', emoji: '🎩' },
+  ];
+
+  if (!isKidsMode) {
+    questions.push(
+      { attribute: 'barba', value: true, label: '🧔 Barba?', emoji: '🧔' },
+      { attribute: 'cabelo', value: 'loiro', label: '🟡 Loiro?', emoji: '🟡' },
+      { attribute: 'cabelo', value: 'preto', label: '⚫ Preto?', emoji: '⚫' },
+      { attribute: 'cabelo', value: 'castanho', label: '🟤 Castanho?', emoji: '🟤' }
+    );
+  }
+
+  const suggestionCount = board.filter(c => !myEliminations.includes(c.name) && getSuggestion(c) === 'eliminate').length;
 
   return (
     <div className="child-container">
       <ScoreBoard game={game} isP1={isP1} p1Ready={true} p2Ready={true} />
 
-      <div className="secret-card-mini" style={{ width: '100%', maxWidth: '500px' }}>
-        <div style={{ fontSize: '1.5rem' }}>㊙️</div>
+      <div className="secret-card-meta">
+        <div style={{ fontSize: '2rem' }}>{mySecret?.avatar}</div>
         <div>
           <p className="secret-label">SEU PERSONAGEM SECRETO:</p>
-          <p className="secret-name">{mySecret}</p>
+          <p className="secret-name">{mySecret?.name}</p>
         </div>
       </div>
 
@@ -741,71 +793,71 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
       </div>
 
       {waitingForAnswer && (
-        <div className="answer-box" style={{ maxWidth: '500px' }}>
+        <div className="answer-box-meta">
           {myTurn ? (
-            <p className="text-sub">VOCÊ PERGUNTOU: <br /><strong style={{ color: 'var(--primary)', fontSize: '1.1rem' }}>{isP1 ? game.board_state.p1_question : game.board_state.p2_question}</strong><br />Aguardando resposta...</p>
+            <p className="text-sub">VOCÊ PERGUNTOU: <br /><strong style={{ color: 'var(--primary)', fontSize: '1.2rem' }}>{isP1 ? game.board_state.p1_question?.label : game.board_state.p2_question?.label}</strong><br />Aguardando...</p>
           ) : (
             <div>
-              <p className="text-sub">ELE PERGUNTOU: <br /><strong style={{ color: 'var(--secondary)', fontSize: '1.1rem' }}>{currentQuestion}</strong></p>
+              <p className="text-sub">ELE PERGUNTOU: <br /><strong style={{ color: 'var(--secondary)', fontSize: '1.2rem' }}>{currentQuestionData?.label}</strong></p>
               <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                <button onClick={() => handleAnswer(true)} className="btn-puffy btn-green" style={{ flex: 1, padding: '10px' }}>SIM ✅</button>
-                <button onClick={() => handleAnswer(false)} className="btn-puffy btn-rose" style={{ flex: 1, padding: '10px' }}>NÃO ❌</button>
+                <button onClick={() => handleAnswer(true)} className="btn-puffy btn-green" style={{ flex: 1 }}>SIM ✅</button>
+                <button onClick={() => handleAnswer(false)} className="btn-puffy btn-rose" style={{ flex: 1 }}>NÃO ❌</button>
               </div>
             </div>
           )}
         </div>
       )}
 
-      {isChoosingGuess && (
-        <div style={{ background: 'var(--accent)', color: 'white', padding: '8px 20px', borderRadius: '100px', fontWeight: 900, fontSize: '0.7rem', marginBottom: '8px' }} className="animate-pulse">
-          👉 TOQUE NO PERSONAGEM QUE VOCÊ ACHA QUE É!
+      {suggestionCount > 0 && !myTurn && (
+        <div className="suggestion-panel animate-pulse">
+          <p style={{ fontWeight: 900, color: 'white', fontSize: '0.8rem' }}>💡 VOCÊ PODE ELIMINAR {suggestionCount} PERSONAGENS!</p>
+          <button onClick={handleBatchEliminate} className="btn-puffy btn-white" style={{ scale: '0.8', marginTop: '4px' }}>ELIMINAR SUGERIDOS 🪄</button>
         </div>
       )}
 
-      <div className="face-grid">
-        {board.map((name, i) => (
-          <div
-            key={i}
-            className={`face-card ${myEliminations.includes(name) ? 'eliminated' : ''} ${isChoosingGuess ? 'pulse' : ''}`}
-            onClick={() => toggleEliminate(name)}
-          >
-            <span className="face-card-emoji">🎭</span>
-            <span className="face-card-name">{name}</span>
-          </div>
-        ))}
+      {isChoosingGuess && (
+        <div className="guess-hint">
+          👉 TOQUE NO PERSONAGEM FINAL!
+        </div>
+      )}
+
+      <div className="face-grid-meta">
+        {board.map((char, i) => {
+          const suggestion = getSuggestion(char);
+          const eliminated = myEliminations.includes(char.name);
+          return (
+            <div
+              key={i}
+              className={`face-card-meta ${eliminated ? 'eliminated' : ''} ${suggestion === 'eliminate' ? 'suggest-red' : suggestion === 'keep' ? 'suggest-green' : ''} ${isChoosingGuess ? 'pulse' : ''}`}
+              onClick={() => toggleEliminate(char.name)}
+            >
+              <div className="face-avatar">{char.avatar}</div>
+              <div className="face-name">{char.name}</div>
+              {suggestion === 'eliminate' && !eliminated && <div className="suggestion-badge">❌</div>}
+              {suggestion === 'keep' && !eliminated && <div className="suggestion-badge-keep">✅</div>}
+            </div>
+          );
+        })}
       </div>
 
-      <div className="question-panel">
+      <div className="question-panel-meta">
         {myTurn && !waitingForAnswer && !isChoosingGuess && (
-          <>
-            <div className="btn-group">
-              <button onClick={() => handleAsk('🐶 É animal?')} className="quick-btn">🐶 É animal?</button>
-              <button onClick={() => handleAsk('🍕 É comida?')} className="quick-btn">🍕 É comida?</button>
-              <button onClick={() => handleAsk('🏠 É objeto?')} className="quick-btn">🏠 É objeto?</button>
-              <button onClick={() => handleAsk('🎭 É personagem?')} className="quick-btn">🎭 É personagem?</button>
-            </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <input
-                type="text"
-                className="input-child"
-                placeholder="Ou faça uma pergunta livre..."
-                style={{ fontSize: '0.75rem', height: '44px' }}
-                value={freeQuestion}
-                onChange={e => setFreeQuestion(e.target.value)}
-                onKeyPress={e => e.key === 'Enter' && handleAsk(freeQuestion)}
-              />
-              <button onClick={() => handleAsk(freeQuestion)} className="btn-puffy btn-blue" style={{ width: '60px', height: '44px' }}>🚀</button>
-            </div>
-          </>
+          <div className="btn-grid-questions">
+            {questions.map((q, idx) => (
+              <button key={idx} onClick={() => handleAsk(q)} className="quick-btn-meta">
+                {q.label}
+              </button>
+            ))}
+          </div>
         )}
 
         {isChoosingGuess ? (
-          <button className="btn-puffy btn-light" onClick={() => setIsChoosingGuess(false)}>CANCELAR PALPITE ↩️</button>
+          <button className="btn-puffy btn-light" onClick={() => setIsChoosingGuess(false)}>CANCELAR ↩️</button>
         ) : (
           <button
             className="btn-puffy btn-purple"
             disabled={!myTurn || waitingForAnswer}
-            style={{ opacity: (!myTurn || waitingForAnswer) ? 0.5 : 1 }}
+            style={{ opacity: (!myTurn || waitingForAnswer) ? 0.5 : 1, width: '100%' }}
             onClick={() => setIsChoosingGuess(true)}
           >
             👉 ACHO QUE É...
@@ -816,8 +868,8 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
           <button onClick={() => {
             const key = isP1 ? 'p1_eliminated' : 'p2_eliminated';
             updateGame(game.id, { board_state: { ...game.board_state, [key]: [] } });
-          }} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#94a3b8' }}>RESETAR CARDS 🔄</button>
-          <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#f43f5e' }}>SAIR DO JOGO 🚪</button>
+          }} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#94a3b8' }}>RESETAR 🔄</button>
+          <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#f43f5e' }}>SAIR 🚪</button>
         </div>
       </div>
     </div>
