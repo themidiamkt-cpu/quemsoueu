@@ -1,20 +1,23 @@
-const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY || import.meta.env.VITE_OPENAI_API_KEY;
+const OPENROUTER_MODEL = import.meta.env.VITE_OPENROUTER_MODEL || 'nvidia/nemotron-3-super-120b-a12b:free';
 
 export async function getCharacterSuggestions(categoryName) {
-    if (!OPENAI_API_KEY) {
-        console.warn('OpenAI API Key missing! Check your .env file.');
+    if (!OPENROUTER_API_KEY) {
+        console.warn('API Key missing! Check your .env file.');
         return null;
     }
 
     try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                'HTTP-Referer': 'https://github.com/themidiamkt-cpu/quemsoueu',
+                'X-Title': 'Quem Sou Eu Realtime',
             },
             body: JSON.stringify({
-                model: 'gpt-3.5-turbo',
+                model: OPENROUTER_MODEL,
                 messages: [
                     {
                         role: 'system',
@@ -30,9 +33,10 @@ export async function getCharacterSuggestions(categoryName) {
         });
 
         const data = await response.json();
-        return data.choices[0].message.content.split(',').map(name => name.trim());
+        console.log('OpenRouter Response:', data);
+        return data.choices?.[0]?.message?.content?.split(',').map(name => name.trim()) || null;
     } catch (error) {
-        console.error('Error fetching suggestions from OpenAI:', error);
+        console.error('Error fetching suggestions from OpenRouter:', error);
         return null;
     }
 }
