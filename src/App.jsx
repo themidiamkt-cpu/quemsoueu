@@ -782,57 +782,44 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
   };
 
   return (
-    <div className="child-container">
-      <ScoreBoard game={game} isP1={isP1} p1Ready={true} p2Ready={true} />
+    <div className="cara-cara-wrapper">
+      <div style={{ padding: '0 8px' }}>
+        <ScoreBoard game={game} isP1={isP1} p1Ready={true} p2Ready={true} />
+      </div>
 
       <div className="secret-card-meta">
-        <div style={{ width: '56px', height: '56px', borderRadius: '14px', overflow: 'hidden', background: 'rgba(255,255,255,0.8)', padding: '6px' }}>
+        <div style={{ width: '32px', height: '32px', borderRadius: '8px', overflow: 'hidden', background: 'rgba(255,255,255,0.8)', padding: '2px' }}>
           <img src={getAvatarUrl(mySecret?.avatar)} alt={mySecret?.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
-        <div>
-          <p className="secret-label">SEU PERSONAGEM SECRETO:</p>
-          <p className="secret-name">{mySecret?.name}</p>
-        </div>
+        <p className="secret-name" style={{ fontSize: '0.85rem' }}>PERSONAGEM: <span style={{ color: 'var(--primary)' }}>{mySecret?.name}</span></p>
       </div>
 
-      <div className={`turn-badge ${myTurn ? 'active' : 'waiting'}`} style={{ marginBottom: '8px' }}>
-        {myTurn ? '👉 SEU TURNO! PERGUNTE 👀' : '⌛ ESPERE O AMIGO...'}
-      </div>
-
-      {
-        waitingForAnswer && (
-          <div className="answer-box-meta">
-            {myTurn ? (
-              <p className="text-sub">VOCÊ PERGUNTOU: <br /><strong style={{ color: 'var(--primary)', fontSize: '1.2rem' }}>{isP1 ? game.board_state.p1_question?.label : game.board_state.p2_question?.label}</strong><br />Aguardando...</p>
-            ) : (
-              <div>
-                <p className="text-sub">ELE PERGUNTOU: <br /><strong style={{ color: 'var(--secondary)', fontSize: '1.2rem' }}>{currentQuestionData?.label}</strong></p>
-                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                  <button onClick={() => handleAnswer(true)} className="btn-puffy btn-green" style={{ flex: 1 }}>SIM ✅</button>
-                  <button onClick={() => handleAnswer(false)} className="btn-puffy btn-rose" style={{ flex: 1 }}>NÃO ❌</button>
-                </div>
+      {waitingForAnswer ? (
+        <div className="answer-box-meta" style={{ margin: '4px 8px', padding: '8px' }}>
+          {myTurn ? (
+            <p className="text-sub" style={{ fontSize: '0.7rem' }}>AGUARDANDO RESPOSTA...</p>
+          ) : (
+            <div>
+              <p className="text-sub" style={{ fontSize: '0.8rem', fontWeight: 900 }}>PERGUNTA: {currentQuestionData?.label}</p>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                <button onClick={() => handleAnswer(true)} className="btn-puffy btn-green" style={{ flex: 1, padding: '8px' }}>SIM ✅</button>
+                <button onClick={() => handleAnswer(false)} className="btn-puffy btn-rose" style={{ flex: 1, padding: '8px' }}>NÃO ❌</button>
               </div>
-            )}
-          </div>
-        )
-      }
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className={`turn-badge ${myTurn ? 'active' : 'waiting'}`} style={{ margin: '4px 8px', fontSize: '0.7rem' }}>
+          {myTurn ? '👉 SEU TURNO! PERGUNTE 👀' : '⌛ ESPERE O AMIGO...'}
+        </div>
+      )}
 
-      {
-        suggestionCount > 0 && !myTurn && (
-          <div className="suggestion-panel animate-pulse">
-            <p style={{ fontWeight: 900, color: 'white', fontSize: '0.8rem' }}>💡 VOCÊ PODE ELIMINAR {suggestionCount} PERSONAGENS!</p>
-            <button onClick={handleBatchEliminate} className="btn-puffy btn-white" style={{ scale: '0.8', marginTop: '4px' }}>ELIMINAR SUGERIDOS 🪄</button>
-          </div>
-        )
-      }
-
-      {
-        isChoosingGuess && (
-          <div className="guess-hint">
-            👉 TOQUE NO PERSONAGEM FINAL!
-          </div>
-        )
-      }
+      {suggestionCount > 0 && !myTurn && (
+        <div className="suggestion-panel animate-pulse">
+          <p style={{ fontWeight: 900, color: 'white', fontSize: '0.7rem' }}>💡 ELIMINE {suggestionCount} PERSONAGENS!</p>
+          <button onClick={handleBatchEliminate} className="btn-puffy btn-white" style={{ scale: '0.7', marginTop: '2px' }}>EXCLUIR 🪄</button>
+        </div>
+      )}
 
       <div className="face-grid-meta">
         {board.map((char, i) => {
@@ -843,63 +830,61 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
               key={i}
               className={`face-card-meta ${eliminated ? 'eliminated' : ''} ${suggestion === 'eliminate' ? 'suggest-red' : suggestion === 'keep' ? 'suggest-green' : ''} ${isChoosingGuess ? 'pulse' : ''}`}
               onClick={() => toggleEliminate(char.name)}
+              style={{ height: '100px' }}
             >
-              <div className="face-avatar" style={{ padding: '6px' }}>
+              <div className="face-avatar">
                 <img src={getAvatarUrl(char.avatar)} alt={char.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
-              <div className="face-name">{char.name}</div>
-              {suggestion === 'eliminate' && !eliminated && <div className="suggestion-badge">❌</div>}
-              {suggestion === 'keep' && !eliminated && <div className="suggestion-badge-keep">✅</div>}
+              <div className="face-name" style={{ fontSize: '0.55rem' }}>{char.name}</div>
+              {suggestion === 'eliminate' && !eliminated && <div className="suggestion-badge">×</div>}
             </div>
           );
         })}
       </div>
 
-      <div className="question-panel-meta">
-        {myTurn && !waitingForAnswer && !isChoosingGuess && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
-            <p style={{ fontSize: '0.75rem', fontWeight: 900, textAlign: 'center', opacity: 0.5, marginBottom: '4px' }}>💬 FAÇA SUA PERGUNTA:</p>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <input
-                type="text"
-                className="input-child-mini"
-                placeholder="Ex: Seu personagem tem barba?..."
-                value={freeQuestion}
-                onChange={e => setFreeQuestion(e.target.value)}
-                onKeyPress={e => e.key === 'Enter' && freeQuestion.trim() && handleAsk({ attribute: 'custom', value: freeQuestion, label: `❓ ${freeQuestion}` })}
-                style={{ flex: 1, height: '48px' }}
-              />
-              <button
-                onClick={() => freeQuestion.trim() && handleAsk({ attribute: 'custom', value: freeQuestion, label: `❓ ${freeQuestion}` })}
-                className="btn-puffy btn-blue"
-                style={{ width: '54px', height: '48px', padding: 0 }}
-              >🚀</button>
-            </div>
+      <div className="cara-cara-footer">
+        {isChoosingGuess ? (
+          <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+            <button className="btn-puffy btn-rose" onClick={() => setIsChoosingGuess(false)} style={{ flex: 1, padding: '8px', fontSize: '0.8rem' }}>CANCELAR ↩️</button>
+            <div className="guess-hint" style={{ flex: 2, margin: 0, padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem' }}>👉 TOQUE NO PERSONAGEM!</div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+            {myTurn && !waitingForAnswer && (
+              <div style={{ flex: 1, display: 'flex', gap: '4px' }}>
+                <input
+                  type="text"
+                  className="input-child-mini"
+                  placeholder="Pergunta..."
+                  value={freeQuestion}
+                  onChange={e => setFreeQuestion(e.target.value)}
+                  onKeyPress={e => e.key === 'Enter' && freeQuestion.trim() && handleAsk({ attribute: 'custom', value: freeQuestion, label: `❓ ${freeQuestion}` })}
+                  style={{ flex: 1, height: '40px', fontSize: '0.8rem' }}
+                />
+                <button
+                  onClick={() => freeQuestion.trim() && handleAsk({ attribute: 'custom', value: freeQuestion, label: `❓ ${freeQuestion}` })}
+                  className="btn-puffy btn-blue"
+                  style={{ width: '40px', height: '40px', padding: 0 }}
+                >🚀</button>
+              </div>
+            )}
+            <button
+              onClick={() => setIsChoosingGuess(true)}
+              className="btn-puffy btn-light"
+              style={{ height: '40px', padding: '0 12px', fontSize: '0.7rem', flexShrink: 0 }}
+            >ACHO QUE É... 🧐</button>
           </div>
         )}
 
-        {isChoosingGuess ? (
-          <button className="btn-puffy btn-light" onClick={() => setIsChoosingGuess(false)}>CANCELAR ↩️</button>
-        ) : (
-          <button
-            className="btn-puffy btn-purple"
-            disabled={!myTurn || waitingForAnswer}
-            style={{ opacity: (!myTurn || waitingForAnswer) ? 0.5 : 1, width: '100%' }}
-            onClick={() => setIsChoosingGuess(true)}
-          >
-            👉 ACHO QUE É...
-          </button>
-        )}
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '4px' }}>
           <button onClick={() => {
             const key = isP1 ? 'p1_eliminated' : 'p2_eliminated';
             updateGame(game.id, { board_state: { ...game.board_state, [key]: [] } });
-          }} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#94a3b8' }}>RESETAR 🔄</button>
-          <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#f43f5e' }}>SAIR 🚪</button>
+          }} className="btn-puffy btn-light" style={{ fontSize: '0.55rem', color: '#94a3b8', padding: '4px' }}>RESETAR 🔄</button>
+          <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.55rem', color: '#f43f5e', padding: '4px' }}>SAIR 🚪</button>
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 
