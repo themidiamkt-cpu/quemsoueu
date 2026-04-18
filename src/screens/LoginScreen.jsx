@@ -1,74 +1,109 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { motion } from 'framer-motion';
+import { Star, Gamepad2 } from 'lucide-react';
 
-export default function LoginScreen({ onLogin }) {
+const FloatingDecor = () => (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="floating-decor float-slow top-10 left-10 text-rose-300"><Star size={40} /></div>
+        <div className="floating-decor float-fast top-1/4 right-20 text-blue-300"><Gamepad2 size={32} /></div>
+        <div className="floating-decor float-slow bottom-20 left-1/4 text-purple-300"><Gamepad2 size={48} /></div>
+        <div className="floating-decor float-fast bottom-40 right-10 text-rose-200"><Star size={24} /></div>
+    </div>
+);
+
+export default function LoginScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [isSignUp, setIsSignUp] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [isRegistering, setIsRegistering] = useState(false);
 
     const handleAuth = async (e) => {
         e.preventDefault();
+        setLoading(true);
         setError(null);
 
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-        if (!supabaseUrl || supabaseUrl.includes('your-project-url')) {
-            setError('Configuração incompleta! Você esqueceu de colocar o URL do seu projeto Supabase no arquivo .env');
-            return;
+        try {
+            const { error } = isRegistering
+                ? await supabase.auth.signUp({ email, password })
+                : await supabase.auth.signInWithPassword({ email, password });
+
+            if (error) throw error;
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
         }
-
-        const { error } = isSignUp
-            ? await supabase.auth.signUp({ email, password })
-            : await supabase.auth.signInWithPassword({ email, password });
-
-        if (error) setError(error.message);
     };
 
     return (
-        <div className="container justify-center">
-            <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="glass space-y-6"
-            >
-                <div className="text-center">
-                    <h2 className="text-3xl font-black text-slate-800">Boas-vindas! 🌈</h2>
-                    <p className="text-slate-500">Faça login para brincar com seus amigos</p>
+        <div className="child-container flex flex-col justify-center min-h-screen items-center px-4 relative">
+            <FloatingDecor />
+
+            <div className="w-full max-w-[360px] relative z-10">
+                <div className="text-center mb-8">
+                    <h1 className="text-hero text-black text-4xl mb-2">
+                        🎯 Quem Sou <span className="text-primary italic">Eu?</span>
+                    </h1>
+                    <p className="text-sm font-bold text-black opacity-50">
+                        Entre para jogar com seus amigos
+                    </p>
                 </div>
 
-                <form onSubmit={handleAuth} className="space-y-4">
-                    <input
-                        type="email"
-                        placeholder="Qual seu e-mail?"
-                        className="puffy w-full"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        required
-                    />
-                    <input
-                        type="password"
-                        placeholder="Sua senha secreta"
-                        className="puffy w-full"
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        required
-                    />
+                <div className="white-card">
+                    <form onSubmit={handleAuth} className="space-y-4">
+                        <div className="space-y-4">
+                            <div className="relative">
+                                <input
+                                    type="email"
+                                    placeholder="Seu e-mail 📧"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="input-child h-16 text-base"
+                                    required
+                                />
+                            </div>
+                            <div className="relative">
+                                <input
+                                    type="password"
+                                    placeholder="Sua senha 🔒"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="input-child h-16 text-base"
+                                    required
+                                />
+                            </div>
+                        </div>
 
-                    {error && <p className="text-rose-500 text-sm text-center font-bold">{error}</p>}
+                        {error && (
+                            <div className="bg-rose-50 text-rose-500 text-[10px] font-black p-3 rounded-xl border border-rose-100 uppercase tracking-wider">
+                                ❌ {error}
+                            </div>
+                        )}
 
-                    <button type="submit" className="puffy w-full py-4 text-lg">
-                        {isSignUp ? 'Criar minha conta' : 'Entrar no Jogo'}
-                    </button>
-                </form>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className={`btn-puffy btn-purple text-white w-full h-16 text-base ${loading ? 'opacity-50' : ''}`}
+                        >
+                            {loading ? 'CARREGANDO... 🎈' : (isRegistering ? '🎮 CRIAR CONTA ✨' : '🎮 ENTRAR NO JOGO')}
+                        </button>
+                    </form>
 
-                <button
-                    onClick={() => setIsSignUp(!isSignUp)}
-                    className="w-full text-slate-400 text-sm font-bold hover:text-indigo-600 transition-colors"
-                >
-                    {isSignUp ? 'Já tenho conta? Entrar' : 'Não tem conta? Criar uma agora'}
-                </button>
-            </motion.div>
+                    <div className="mt-8 pt-6 border-t border-slate-50">
+                        <button
+                            onClick={() => setIsRegistering(!isRegistering)}
+                            className="text-xs font-black text-black opacity-40 hover:opacity-100 transition-opacity uppercase tracking-widest"
+                        >
+                            {isRegistering ? 'Já tenho conta? Entrar 🔑' : 'Não tem conta? Criar conta ✨'}
+                        </button>
+                    </div>
+                </div>
+
+                <p className="text-[10px] font-black opacity-20 text-center mt-8 uppercase tracking-[0.2em]">
+                    Um jogo para duplas divertidas
+                </p>
+            </div>
         </div>
     );
 }

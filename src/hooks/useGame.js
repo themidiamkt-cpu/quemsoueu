@@ -20,19 +20,19 @@ export function useGame() {
         return () => subscription.unsubscribe();
     }, []);
 
-    const createGame = async (player2Email) => {
-        // This is a simplified invite logic
-        // In a real app, we'd find the user ID by email first
-        const { data: guest } = await supabase.rpc('get_user_id_by_email', { email: player2Email });
+    const createRoom = async () => {
+        if (!user) return;
 
-        if (!guest) throw new Error('Jogador não encontrado!');
+        // Generate a simple 6-char code
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
 
         const { data, error } = await supabase
             .from('games')
             .insert([
                 {
                     player1_id: user.id,
-                    player2_id: guest,
+                    player2_id: null, // Open for anyone with the code
+                    room_code: code,
                     status: 'setup',
                     scores: { p1: 0, p2: 0 }
                 }
@@ -43,6 +43,39 @@ export function useGame() {
         if (error) throw error;
         setGame(data);
         return data;
+    };
+
+    const joinRoom = async (code) => {
+        if (!user || !code) return;
+
+        const cleanCode = code.trim().toUpperCase();
+
+        // 1. Find the room
+        const { data: room, error: findError } = await supabase
+            .from('games')
+            .select('*')
+            .eq('room_code', cleanCode)
+            .eq('status', 'setup')
+            .maybeSingle();
+
+        if (findError) throw findError;
+        if (!room) throw new Error('Sala não encontrada! Verifique o código.');
+        if (room.player1_id === user.id) {
+            setGame(room);
+            return room;
+        }
+
+        // 2. Join the room
+        const { data: joined, error: joinError } = await supabase
+            .from('games')
+            .update({ player2_id: user.id })
+            .eq('id', room.id)
+            .select()
+            .single();
+
+        if (joinError) throw joinError;
+        setGame(joined);
+        return joined;
     };
 
     const subscribeToGame = (gameId) => {
@@ -56,15 +89,50 @@ export function useGame() {
         return () => supabase.removeChannel(channel);
     };
 
-    const updateCharacter = async (gameId, playerKey, character) => {
-        const column = playerKey === 'p1' ? 'player1_character' : 'player2_character';
-        const { error } = await supabase
+    const updateGame = async (gameId, updates) => {
+        const { data, error } = await supabase
             .from('games')
-            .update({ [column]: character })
-            .eq('id', gameId);
+            .update(updates)
+            .eq('id', gameId)
+            .select()
+            .single();
 
         if (error) throw error;
+        if (data) setGame(data);
     };
 
-    return { user, game, setGame, loading, createGame, subscribeToGame, updateCharacter };
+    const fetchGame = async () => {
+        if (!game?.id) return;
+        const { data } = await supabase
+            .from('games')
+            .select('*')
+            .eq('id', game.id)
+            .single();
+
+        if (data) setGame(data);
+    };
+
+    const exitRoom = async () => {
+        if (!game || !user) {
+            setGame(null);
+            return;
+        }
+
+        try {
+            const isP1 = game.player1_id === user.id;
+            if (isP1) {
+                // P1 closes the room
+                await supabase.from('games').update({ status: 'cancelled' }).eq('id', game.id);
+            } else {
+                // P2 just leaves the room
+                await supabase.from('games').update({ player2_id: null }).eq('id', game.id);
+            }
+        } catch (err) {
+            console.error("Erro ao sair da sala:", err);
+        } finally {
+            setGame(null);
+        }
+    };
+
+    return { user, game, setGame, loading, createRoom, joinRoom, exitRoom, subscribeToGame, updateGame, fetchGame };
 }
