@@ -834,25 +834,22 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
 
       <div className="question-panel-meta">
         {myTurn && !waitingForAnswer && !isChoosingGuess && (
-          <div className="btn-grid-questions">
-            {questions.map((q, idx) => (
-              <button key={idx} onClick={() => handleAsk(q)} className="quick-btn-meta">
-                {q.label}
-              </button>
-            ))}
-            <div style={{ gridColumn: 'span 2', display: 'flex', gap: '4px', marginTop: '4px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 900, textAlign: 'center', opacity: 0.5, marginBottom: '4px' }}>💬 FAÇA SUA PERGUNTA:</p>
+            <div style={{ display: 'flex', gap: '8px' }}>
               <input
                 type="text"
                 className="input-child-mini"
-                placeholder="Pergunta livre..."
+                placeholder="Ex: Seu personagem tem barba?..."
                 value={freeQuestion}
                 onChange={e => setFreeQuestion(e.target.value)}
                 onKeyPress={e => e.key === 'Enter' && freeQuestion.trim() && handleAsk({ attribute: 'custom', value: freeQuestion, label: `❓ ${freeQuestion}` })}
+                style={{ flex: 1, height: '48px' }}
               />
               <button
                 onClick={() => freeQuestion.trim() && handleAsk({ attribute: 'custom', value: freeQuestion, label: `❓ ${freeQuestion}` })}
                 className="btn-puffy btn-blue"
-                style={{ width: '44px', height: '36px', padding: 0 }}
+                style={{ width: '54px', height: '48px', padding: 0 }}
               >🚀</button>
             </div>
           </div>
