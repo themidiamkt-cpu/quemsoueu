@@ -16,7 +16,7 @@ import {
 import { supabase } from './lib/supabase';
 import { useGame } from './hooks/useGame';
 import { getCharacterSuggestions } from './services/aiService';
-import { categories } from './data/characters';
+import { categories, characterBank } from './data/characters';
 import LoginScreen from './screens/LoginScreen';
 
 // Base UI Component
@@ -47,6 +47,14 @@ export default function App() {
   const [localCharacter, setLocalCharacter] = useState('');
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [activeCategory, setActiveCategory] = useState(categories[0]);
+
+  useEffect(() => {
+    if (activeCategory.id && characterBank[activeCategory.id]) {
+      const bank = characterBank[activeCategory.id];
+      const shuffled = [...bank].sort(() => 0.5 - Math.random());
+      setSuggestions(shuffled.slice(0, 8)); // Showing 8 local suggestions instead of 5
+    }
+  }, [activeCategory]);
 
   useEffect(() => {
     if (game?.id) {
@@ -136,20 +144,19 @@ export default function App() {
 
           {!myChoiceDone && (
             <div className="space-y-6">
-              <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+              <div className="flex gap-3 overflow-x-auto pb-6 no-scrollbar -mx-2 px-2 h-16">
                 {categories.map(cat => (
                   <button
                     key={cat.id}
                     onClick={() => setActiveCategory(cat)}
-                    className={`px-4 py-2 rounded-full whitespace-nowrap font-bold text-xs transition-all ${activeCategory.id === cat.id ? 'bg-secondary text-white shadow-lg' : 'bg-slate-100 text-slate-400'
-                      }`}
+                    className={`category-chip ${activeCategory.id === cat.id ? 'active' : 'inactive'}`}
                   >
                     {cat.name}
                   </button>
                 ))}
               </div>
 
-              <div className="relative">
+              <div className="space-y-2">
                 <input
                   type="text"
                   placeholder="Nome do personagem..."
@@ -159,28 +166,40 @@ export default function App() {
                 />
               </div>
 
-              <div className="space-y-3 pt-4 border-t-2 border-dashed border-slate-100">
-                <button
-                  onClick={generateAiSuggestions}
-                  disabled={isAiLoading}
-                  className="w-full h-16 bg-gradient-to-r from-sky-400 to-indigo-500 text-white rounded-2xl flex items-center justify-center gap-2 font-black shadow-[0_6px_0_#0369a1] active:translate-y-1 active:shadow-none transition-all px-4"
-                >
-                  <Zap size={24} fill="currentColor" />
-                  {isAiLoading ? 'CHAMANDO CHAT GPT...' : 'GERAR COM CHAT GPT! 🤖'}
-                </button>
+              <div className="space-y-4 pt-4">
+                <div className="flex items-center justify-between px-2">
+                  <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest">Sugestões Rápidas</p>
+                  <button
+                    onClick={() => setActiveCategory({ ...activeCategory })}
+                    className="text-[10px] font-black text-secondary hover:underline cursor-pointer"
+                  >
+                    Trocar opções 🎲
+                  </button>
+                </div>
 
-                <p className="text-[10px] text-slate-400 font-bold uppercase">Sugestões mágicas para crianças de 8 anos</p>
-
-                <div className="flex flex-wrap gap-2 justify-center">
+                <div className="flex flex-wrap gap-3 justify-center">
                   {suggestions.map((s, idx) => (
-                    <button
+                    <motion.button
                       key={idx}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => setLocalCharacter(s)}
-                      className="bg-white text-sky-600 px-4 py-2 rounded-full text-sm font-black border-2 border-sky-100 shadow-sm hover:bg-sky-50 transition-colors"
+                      className="suggestion-chip"
                     >
                       {s}
-                    </button>
+                    </motion.button>
                   ))}
+                </div>
+
+                <div className="pt-4 border-t-2 border-dashed border-slate-100 space-y-3">
+                  <button
+                    onClick={generateAiSuggestions}
+                    disabled={isAiLoading}
+                    className="w-full h-14 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center gap-2 font-black border-2 border-indigo-100 hover:bg-indigo-100 transition-all text-sm"
+                  >
+                    <Zap size={18} fill="currentColor" />
+                    {isAiLoading ? 'CHAMANDO CHAT GPT...' : 'Gerar mais com IA 🤖'}
+                  </button>
                 </div>
               </div>
 
@@ -201,6 +220,12 @@ export default function App() {
                 <RotateCcw size={48} className="text-amber-500" />
               </div>
               <p className="text-slate-400 font-bold italic">Seu amigo ainda está escolhendo...</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="text-xs font-bold text-indigo-500 underline uppercase tracking-widest"
+              >
+                Ainda nada? Clique aqui para atualizar 🔄
+              </button>
             </div>
           )}
 
