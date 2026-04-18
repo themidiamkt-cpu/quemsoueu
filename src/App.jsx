@@ -55,23 +55,48 @@ const ScoreBoard = ({ game, isP1 }) => {
   const p1Name = game.player1_name || 'Jogador 1';
   const p2Name = game.player2_name || 'Jogador 2';
 
+  const s1 = isP1 ? scores.p1 : scores.p2;
+  const s2 = isP1 ? scores.p2 : scores.p1;
+  const n1 = isP1 ? p1Name : p2Name;
+  const n2 = isP1 ? p2Name : p1Name;
+
   return (
-    <div className="bg-white rounded-2xl shadow-puffy border-2 border-slate-100 flex overflow-hidden mb-6 relative z-10 mx-2">
-      <div className="flex-1 py-4 px-2 text-center border-r border-slate-50 min-w-0">
-        <div className="text-[10px] font-black text-slate-400 uppercase truncate px-1">
-          {isP1 ? p1Name : p2Name}
-        </div>
-        <div className="text-3xl font-black text-primary leading-none mt-1">
-          {isP1 ? scores.p1 : scores.p2}
+    <div className="relative flex items-stretch justify-between mb-10 gap-0 h-28 w-full z-20">
+      {/* VS Badge */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
+        <div className="w-14 h-14 bg-white rounded-full shadow-2xl border-4 border-slate-50 flex items-center justify-center animate-bounce-slow">
+          <span className="text-[10px] font-black text-slate-300 italic tracking-tighter">VS</span>
         </div>
       </div>
-      <div className="flex-1 py-4 px-2 text-center min-w-0">
-        <div className="text-3xl font-black text-secondary leading-none">
-          {isP1 ? scores.p2 : scores.p1}
-        </div>
-        <div className="text-[10px] font-black text-slate-400 uppercase truncate px-1 mt-1">
-          {isP1 ? p2Name : p1Name}
-        </div>
+
+      {/* P1 Section */}
+      <div className="flex-1 bg-gradient-to-br from-indigo-600 via-blue-500 to-cyan-400 rounded-l-[40px] p-4 flex flex-col items-center justify-center shadow-puffy border-b-8 border-indigo-800/30 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-12 h-full bg-white/10 skew-x-[-20deg] translate-x-6"></div>
+        <span className="text-[10px] font-black text-white/60 uppercase truncate w-full text-center mb-1 relative z-10 tracking-widest">{n1}</span>
+        <motion.span
+          key={s1}
+          initial={{ y: 20, opacity: 0, scale: 0.5 }}
+          animate={{ y: 0, opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+          className="text-5xl font-black text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.2)] relative z-10"
+        >
+          {s1}
+        </motion.span>
+      </div>
+
+      {/* P2 Section */}
+      <div className="flex-1 bg-gradient-to-br from-rose-500 via-purple-500 to-indigo-600 rounded-r-[40px] p-4 flex flex-col items-center justify-center shadow-puffy border-b-8 border-purple-800/30 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-12 h-full bg-white/10 skew-x-[-20deg] -translate-x-6"></div>
+        <motion.span
+          key={s2}
+          initial={{ y: 20, opacity: 0, scale: 0.5 }}
+          animate={{ y: 0, opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+          className="text-5xl font-black text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.2)] relative z-10"
+        >
+          {s2}
+        </motion.span>
+        <span className="text-[10px] font-black text-white/60 uppercase truncate w-full text-center mt-1 relative z-10 tracking-widest">{n2}</span>
       </div>
     </div>
   );
