@@ -57,20 +57,10 @@ const PlayerAvatar = ({ name, colorIndex = 0, isActive }) => {
     'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)',
     'linear-gradient(135deg, #10b981 0%, #059669 100%)'
   ];
-  const initial = (name || '?').charAt(0).toUpperCase();
-  const gradients = [
-    'linear-gradient(135deg, #fb7185 0%, #e11d48 100%)',
-    'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)',
-    'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
-    'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)',
-    'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-  ];
-
   // Helper to get Twemoji SVG URL for an emoji
   const getAvatarUrl = (emoji) => {
     if (!emoji || emoji.startsWith('http')) return emoji;
     const codes = [...emoji].map(c => c.codePointAt(0).toString(16)).join('-');
-    // Special handling for some combined emojis if needed, but standard ZWJ usually works
     return `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${codes}.svg`;
   };
 
