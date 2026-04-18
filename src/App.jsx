@@ -16,7 +16,7 @@ import { useGame } from './hooks/useGame';
 import { categories, characterBank } from './data/characters';
 import LoginScreen from './screens/LoginScreen';
 
-// --- DECORATIVE COMPONENTS ---
+// --- COMPONENTS ---
 
 const SlotMachine = ({ target, categoryId, onFinish }) => {
   const [names, setNames] = useState([]);
@@ -38,65 +38,86 @@ const SlotMachine = ({ target, categoryId, onFinish }) => {
   }, [target, categoryId]);
 
   return (
-    <div className="slot-container mb-4">
+    <div className="slot-container">
       <div className="slot-list">
         {names.map((name, i) => (
-          <div key={i} className="slot-item">
-            {name}
-          </div>
+          <div key={i} className="slot-item">{name}</div>
         ))}
       </div>
     </div>
   );
 };
 
-const ScoreBoard = ({ game, isP1 }) => {
-  const scores = game.scores || { p1: 0, p2: 0 };
-  const p1Name = game.player1_name || 'Jogador 1';
-  const p2Name = game.player2_name || 'Jogador 2';
-
-  const s1 = isP1 ? scores.p1 : scores.p2;
-  const s2 = isP1 ? scores.p2 : scores.p1;
-  const n1 = isP1 ? p1Name : p2Name;
-  const n2 = isP1 ? p2Name : p1Name;
+const PlayerAvatar = ({ name, colorIndex = 0, isActive }) => {
+  const colors = [
+    'from-rose-400 to-rose-500',
+    'from-blue-400 to-blue-500',
+    'from-purple-400 to-purple-500',
+    'from-amber-400 to-amber-500',
+    'from-emerald-400 to-emerald-500'
+  ];
+  const initial = (name || '?').charAt(0).toUpperCase();
+  const bgGradient = colors[colorIndex % colors.length];
 
   return (
-    <div className="relative flex items-stretch justify-between mb-10 gap-0 h-28 w-full z-20">
-      {/* VS Badge */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
-        <div className="w-14 h-14 bg-white rounded-full shadow-2xl border-4 border-slate-50 flex items-center justify-center animate-bounce-slow">
-          <span className="text-[10px] font-black text-slate-300 italic tracking-tighter">VS</span>
+    <div className={`w-10 h-10 bg-gradient-to-br ${bgGradient} rounded-2xl flex items-center justify-center border-2 border-white shadow-sm transition-all duration-300 transform ${isActive ? 'scale-110 shadow-md ring-2 ring-primary/20' : ''} shrink-0`}>
+      <span className="text-white font-black text-sm">{initial}</span>
+    </div>
+  );
+};
+
+const ScoreBoard = ({ game, isP1, p1Ready, p2Ready }) => {
+  const scores = game.scores || { p1: 0, p2: 0 };
+  const p1Name = game.player1_name || '👤';
+  const p2Name = game.player2_name || '👤';
+
+  const n1 = isP1 ? p1Name : p2Name;
+  const n2 = isP1 ? p2Name : p1Name;
+  const s1 = isP1 ? scores.p1 : scores.p2;
+  const s2 = isP1 ? scores.p2 : scores.p1;
+  const r1 = isP1 ? p1Ready : p2Ready;
+  const r2 = isP1 ? p2Ready : p1Ready;
+
+  return (
+    <div className="w-full relative z-20 flex flex-col items-center">
+      <div className="hud-card">
+        {/* Lado 1 */}
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <PlayerAvatar name={n1} colorIndex={isP1 ? 0 : 1} isActive={r1} />
+          <div className="flex flex-col min-w-0">
+            <span className={`text-[10px] font-black uppercase truncate leading-none mb-1 ${r1 ? 'text-primary' : 'text-slate-400'}`}>
+              {n1}
+            </span>
+            <span className="text-sm font-black text-rose-500 leading-none">{s1}</span>
+          </div>
+        </div>
+
+        {/* Centro VS */}
+        <div className="px-4">
+          <motion.div
+            animate={r1 && r2 ? { scale: [1, 1.2, 1] } : {}}
+            transition={{ repeat: Infinity, duration: 1 }}
+            className="text-lg font-black italic text-primary opacity-30"
+          >
+            VS
+          </motion.div>
+        </div>
+
+        {/* Lado 2 */}
+        <div className="flex items-center gap-2 min-w-0 flex-1 justify-end text-right">
+          <div className="flex flex-col min-w-0 items-end">
+            <span className={`text-[10px] font-black uppercase truncate leading-none mb-1 ${r2 ? 'text-secondary' : 'text-slate-400'}`}>
+              {n2}
+            </span>
+            <span className="text-sm font-black text-blue-500 leading-none">{s2}</span>
+          </div>
+          <PlayerAvatar name={n2} colorIndex={isP1 ? 1 : 0} isActive={r2} />
         </div>
       </div>
 
-      {/* P1 Section */}
-      <div className="flex-1 bg-gradient-to-br from-indigo-600 via-blue-500 to-cyan-400 rounded-l-[40px] p-4 flex flex-col items-center justify-center shadow-puffy border-b-8 border-indigo-800/30 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-12 h-full bg-white/10 skew-x-[-20deg] translate-x-6"></div>
-        <span className="text-[10px] font-black text-white/60 uppercase truncate w-full text-center mb-1 relative z-10 tracking-widest">{n1}</span>
-        <motion.span
-          key={s1}
-          initial={{ y: 20, opacity: 0, scale: 0.5 }}
-          animate={{ y: 0, opacity: 1, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 15 }}
-          className="text-5xl font-black text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.2)] relative z-10"
-        >
-          {s1}
-        </motion.span>
-      </div>
-
-      {/* P2 Section */}
-      <div className="flex-1 bg-gradient-to-br from-rose-500 via-purple-500 to-indigo-600 rounded-r-[40px] p-4 flex flex-col items-center justify-center shadow-puffy border-b-8 border-purple-800/30 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-12 h-full bg-white/10 skew-x-[-20deg] -translate-x-6"></div>
-        <motion.span
-          key={s2}
-          initial={{ y: 20, opacity: 0, scale: 0.5 }}
-          animate={{ y: 0, opacity: 1, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 15 }}
-          className="text-5xl font-black text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.2)] relative z-10"
-        >
-          {s2}
-        </motion.span>
-        <span className="text-[10px] font-black text-white/60 uppercase truncate w-full text-center mt-1 relative z-10 tracking-widest">{n2}</span>
+      <div className="flex items-center gap-1.5 opacity-30 mb-6">
+        <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+        <span className="text-[10px] font-black tracking-widest uppercase">SALA: {game.room_code}</span>
       </div>
     </div>
   );
@@ -168,7 +189,6 @@ export default function App() {
   const handleWin = async () => {
     if (!game?.id) return;
 
-    // Confetti de vitória!
     confetti({
       particleCount: 200,
       spread: 100,
@@ -176,7 +196,6 @@ export default function App() {
       colors: ['#4ade80', '#8b5cf6', '#38bdf8']
     });
 
-    // Feedback tátil
     window.navigator.vibrate?.([100, 50, 100]);
 
     const isP1 = game.player1_id === user.id;
@@ -186,7 +205,6 @@ export default function App() {
       [isP1 ? 'p2' : 'p1']: (currentScores[isP1 ? 'p2' : 'p1'] || 0) + 1
     };
 
-    // Reset game but keep scores
     await updateGame(game.id, {
       player1_character: null,
       player2_character: null,
@@ -194,24 +212,19 @@ export default function App() {
       scores: newScores
     });
 
-    // Reset local state
     setSelectedCharacter('');
     setRolling(false);
   };
 
-  if (loading) return <div className="child-container items-center justify-center"><h1 className="text-black font-black animate-bounce text-3xl">🎈...</h1></div>;
+  if (loading) return <div className="child-container items-center justify-center min-h-screen"><h1 className="font-black animate-bounce text-2xl">🎈...</h1></div>;
   if (!user) return <LoginScreen />;
 
   // --- VIEWS ---
 
   const renderLobby = () => (
     <div className="child-container">
-
-      <div className="text-center relative z-10">
-        <h1 className="text-hero text-black">
-          🎯 <br />
-          Quem Sou <span className="text-primary italic">Eu?</span>
-        </h1>
+      <div className="text-center w-full py-8">
+        <h1 className="text-hero">🎯 <br />Quem Sou <span className="text-primary italic">Eu?</span></h1>
         <p className="text-sub">Jogo divertido em dupla</p>
 
         <div className="white-card space-y-6">
@@ -219,7 +232,7 @@ export default function App() {
             <input
               type="text"
               placeholder="Seu Nome 👤"
-              className="input-child h-14 text-sm"
+              className="input-child text-sm"
               maxLength={12}
               value={playerName}
               onChange={e => setPlayerName(e.target.value)}
@@ -229,26 +242,25 @@ export default function App() {
                 try {
                   await createRoom(playerName);
                 } catch (err) {
-                  alert("Erro ao criar sala. Verifique se o banco de dados está atualizado! ❌");
-                  console.error(err);
+                  alert("Erro ao criar sala. ❌");
                 }
               }}
-              className="btn-puffy btn-purple text-white"
+              className="btn-puffy btn-purple"
             >
-              <Users size={28} /> CRIAR SALA
+              <Users size={24} /> CRIAR SALA
             </button>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="h-[2px] bg-slate-100 flex-1"></div>
-            <span className="text-[10px] font-black opacity-20">OU</span>
-            <div className="h-[2px] bg-slate-100 flex-1"></div>
+            <div className="h-[2px] bg-slate-50 flex-1"></div>
+            <span className="text-[10px] font-black opacity-20 uppercase">OU</span>
+            <div className="h-[2px] bg-slate-50 flex-1"></div>
           </div>
 
           <div className="space-y-3">
             <input
               type="text"
-              placeholder="Digite o código 🎯"
+              placeholder="Código da Sala 🎯"
               className="input-child"
               maxLength={6}
               value={roomCode}
@@ -260,12 +272,11 @@ export default function App() {
                   if (roomCode) await joinRoom(roomCode, playerName);
                 } catch (err) {
                   alert(err.message || "Erro ao entrar na sala. ❌");
-                  console.error(err);
                 }
               }}
-              className={`btn-puffy btn-green text-white transition-opacity ${!roomCode ? 'opacity-50' : ''}`}
+              className={`btn-puffy btn-green ${!roomCode ? 'opacity-50' : ''}`}
             >
-              <Play size={28} /> ENTRAR
+              <Play size={24} /> ENTRAR NA SALA
             </button>
           </div>
         </div>
@@ -286,39 +297,32 @@ export default function App() {
 
     return (
       <div className="child-container">
-        <ScoreBoard game={game} isP1={isP1} />
+        <ScoreBoard game={game} isP1={isP1} p1Ready={!!game.player1_character} p2Ready={!!game.player2_character} />
 
-        <div className="flex justify-between items-center mb-6 relative z-10">
-          <h2 className="text-xl font-black text-black">🎯 Seu personagem</h2>
-          <div className="text-right">
-            <p className="text-[10px] font-black opacity-30 uppercase">SALA</p>
-            <p className="text-sm font-black text-primary">{game.room_code}</p>
-          </div>
+        <div className="text-center mb-6">
+          <h2 className="text-xl font-black">🎯 Seu personagem</h2>
         </div>
 
-        <div className="relative z-10">
+        <div className="w-full">
           {!game.player2_id ? (
             <div className="white-card">
-              <div className="text-6xl mb-4 animate-bounce">🎈</div>
-              <h3 className="text-2xl font-black text-black">ESPERE UM AMIGO</h3>
-              <p className="text-sm text-black opacity-50 font-bold leading-relaxed px-4 py-4">
+              <div className="text-5xl mb-4 animate-bounce">🎈</div>
+              <h3 className="text-2xl font-black">ESPERE UM AMIGO</h3>
+              <p className="text-sm opacity-50 font-bold leading-relaxed px-4 py-4">
                 Passe o código <br />
-                <span className="text-3xl text-primary font-black block mt-2">{game.room_code}</span>
+                <span className="text-3xl text-primary font-black block mt-2 tracking-widest">{game.room_code}</span>
               </p>
-              <button onClick={exitRoom} className="btn-puffy btn-light text-xs mt-4">
-                CANCELAR SALA 🚪
-              </button>
+              <button onClick={exitRoom} className="btn-puffy btn-light text-xs mt-4">CANCELAR SALA 🚪</button>
             </div>
           ) : (
             <>
               {myChoiceDone ? (
-                <div className="white-card animate-slide-up">
-                  <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center animate-pulse mx-auto mb-6">
-                    <RotateCcw size={40} className="text-primary" />
+                <div className="white-card">
+                  <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center animate-pulse mx-auto mb-6">
+                    <RotateCcw size={32} className="text-primary" />
                   </div>
-                  <h3 className="text-2xl font-black text-black uppercase">TUDO PRONTO! ✅</h3>
-                  <p className="text-sm text-black opacity-50 font-bold mb-8">Agora espere seu amigo escolher o seu personagem...</p>
-
+                  <h3 className="text-xl font-black uppercase mb-2">TUDO PRONTO! ✅</h3>
+                  <p className="text-sm opacity-50 font-bold mb-8">Esperando seu amigo...</p>
                   <div className="space-y-4">
                     <button onClick={fetchGame} className="btn-puffy btn-light text-xs">ATUALIZAR STATUS 🔄</button>
                     <button onClick={exitRoom} className="btn-puffy btn-light text-xs text-rose-500">SAIR DA SALA 🚪</button>
@@ -327,53 +331,29 @@ export default function App() {
               ) : (
                 <div className="space-y-4">
                   <div className="white-card">
-                    <div>
-                      <span className="badge">{isAllMode ? '🔥 MODO ALEATÓRIO' : activeCategory.name}</span>
-                      {rolling ? (
-                        <SlotMachine
-                          target={selectedCharacter}
-                          categoryId={isAllMode ? 'all' : activeCategory.id}
-                          onFinish={() => setRolling(false)}
-                        />
-                      ) : (
-                        <h3 className="text-hero text-black animate-scale-in text-4xl">{selectedCharacter}</h3>
-                      )}
-                    </div>
-
+                    <span className="badge">{isAllMode ? '🔥 MODO ALEATÓRIO' : activeCategory.name}</span>
+                    {rolling ? (
+                      <SlotMachine target={selectedCharacter} categoryId={isAllMode ? 'all' : activeCategory.id} onFinish={() => setRolling(false)} />
+                    ) : (
+                      <h3 className="text-hero text-black animate-scale-in text-4xl">{selectedCharacter}</h3>
+                    )}
                     {!rolling && (
-                      <button onClick={handleConfirmChoice} className="btn-puffy btn-blue text-white mt-4">
-                        ESCOLHER ESTE! 🚀
-                      </button>
+                      <button onClick={handleConfirmChoice} className="btn-puffy btn-blue mt-6 shadow-lg">ESCOLHER ESTE! 🚀</button>
                     )}
                   </div>
-
                   <div className="grid grid-cols-2 gap-3">
-                    <button onClick={() => sortear()} className="btn-puffy btn-light text-xs">
-                      <Dice5 size={18} /> OUTRO
-                    </button>
-                    <button onClick={trocarCategoria} className="btn-puffy btn-light text-xs">
-                      <RotateCcw size={18} /> LISTA
-                    </button>
+                    <button onClick={() => sortear()} className="btn-puffy btn-light text-xs"><Dice5 size={18} /> OUTRO</button>
+                    <button onClick={trocarCategoria} className="btn-puffy btn-light text-xs"><RotateCcw size={18} /> LISTA</button>
                   </div>
-
-                  <button onClick={modoAleatorio} className="btn-puffy btn-purple text-white text-xs">
-                    🔥 MODO ALEATÓRIO TOTAL
-                  </button>
-
-                  <div className="pt-6 border-t border-slate-50 mt-6">
-                    <button onClick={exitRoom} className="btn-puffy btn-light text-rose-500 text-sm">
-                      SAIR DA SALA 🚪
-                    </button>
-                  </div>
+                  <button onClick={modoAleatorio} className="btn-puffy btn-purple text-xs">🔥 MODO ALEATÓRIO TOTAL</button>
+                  <button onClick={exitRoom} className="btn-puffy btn-light text-rose-500 text-sm mt-4">SAIR DA SALA 🚪</button>
                 </div>
               )}
             </>
           )}
 
           {(myChoiceDone && opponentChoiceDone) && (
-            <button onClick={() => updateGame(game.id, { status: 'playing' })} className="btn-puffy btn-green text-white mt-6 animate-bounce">
-              JOGAR AGORA! ▶️
-            </button>
+            <button onClick={() => updateGame(game.id, { status: 'playing' })} className="btn-puffy btn-green mt-6 animate-bounce shadow-xl">JOGAR AGORA! ▶️</button>
           )}
         </div>
       </div>
@@ -386,37 +366,33 @@ export default function App() {
 
     return (
       <div className="child-container">
-        <ScoreBoard game={game} isP1={isP1} />
+        <ScoreBoard game={game} isP1={isP1} p1Ready={!!game.player1_character} p2Ready={!!game.player2_character} />
 
-        <div className="text-center mb-6 relative z-10">
+        <div className="text-center mb-6 w-full">
           <span className="badge bg-primary text-white">🎮 SEU AMIGO É...</span>
           <div className="white-card">
-            <h2 className="text-black font-black text-4xl tracking-tight">{opponentChar}</h2>
-            <p className="text-[10px] font-black uppercase opacity-40 mt-2">Dê dicas para ele!</p>
+            <h2 className="font-black text-4xl tracking-tight">{opponentChar}</h2>
+            <p className="text-[10px] font-black uppercase opacity-30 mt-2">Dê dicas para ele!</p>
           </div>
         </div>
 
-        <div className="text-center mb-8 relative z-10">
+        <div className="text-center mb-8 w-full">
           <span className="badge bg-secondary text-white">🤔 QUEM SURPRESA?</span>
           <div className="white-card py-10">
-            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <HelpCircle size={40} className="text-slate-300 animate-pulse" />
+            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <HelpCircle size={32} className="text-slate-200 animate-pulse" />
             </div>
-            <p className="text-xs font-black text-black opacity-30 tracking-[0.2em]">FAÇA PERGUNTAS!</p>
+            <p className="text-[10px] font-black opacity-20 tracking-widest">FAÇA PERGUNTAS!</p>
           </div>
         </div>
 
-        <div className="mt-auto space-y-4 relative z-10">
-          <button className="btn-puffy btn-purple text-white shadow-xl" onClick={() => (confetti(), window.navigator.vibrate?.(50))}>
-            <Star size={24} fill="white" /> TIVE UMA IDEIA!
+        <div className="mt-auto w-full space-y-4">
+          <button className="btn-puffy btn-purple shadow-xl" onClick={() => (confetti(), window.navigator.vibrate?.(50))}>
+            <Star size={24} fill="white" className="text-white" /> TIVE UMA IDEIA!
           </button>
           <div className="grid grid-cols-2 gap-4">
-            <button className="btn-puffy btn-rose text-white h-16" onClick={handleWin}>
-              ACERTOU! 🎉
-            </button>
-            <button className="btn-puffy btn-light h-16 text-xs" onClick={exitRoom}>
-              SAIR 🚪
-            </button>
+            <button className="btn-puffy btn-rose" onClick={handleWin}>ACERTOU! 🎉</button>
+            <button className="btn-puffy btn-light text-xs" onClick={exitRoom}>SAIR 🚪</button>
           </div>
         </div>
       </div>
@@ -427,9 +403,9 @@ export default function App() {
     <AnimatePresence mode="wait">
       <motion.div
         key={!game ? 'lobby' : game.status}
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 1.05 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
         className="w-full flex justify-center"
       >
         {!game && renderLobby()}
