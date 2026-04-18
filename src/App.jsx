@@ -340,11 +340,15 @@ export default function App() {
           ← Voltar
         </button>
         <h1 className="text-hero">
-          {selectedGameType === 'guess' ? '🎯' : '🃏'} <br />
-          {selectedGameType === 'guess' ? 'Quem Sou ' : 'Jogo da '}
-          <span style={{ color: 'var(--primary)', fontStyle: 'italic' }}>{selectedGameType === 'guess' ? 'Eu?' : 'Memória'}</span>
+          {selectedGameType === 'guess' ? '🎯' : selectedGameType === 'memory' ? '🃏' : '🎭'} <br />
+          {selectedGameType === 'guess' ? 'Quem Sou ' : selectedGameType === 'memory' ? 'Jogo da ' : 'Cara a '}
+          <span style={{ color: 'var(--primary)', fontStyle: 'italic' }}>{selectedGameType === 'guess' ? 'Eu?' : selectedGameType === 'memory' ? 'Memória' : 'Cara'}</span>
         </h1>
-        <p className="text-sub">{selectedGameType === 'guess' ? 'Jogo divertido em dupla' : 'Treine sua mente em dupla'}</p>
+        <p className="text-sub">
+          {selectedGameType === 'guess' ? 'Jogo divertido em dupla' :
+            selectedGameType === 'memory' ? 'Treine sua mente em dupla' :
+              'Adivinhe quem seu amigo é!'}
+        </p>
 
         <div className="white-card" style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '32px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

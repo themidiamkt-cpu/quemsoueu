@@ -62,11 +62,18 @@ export function useGame() {
             .maybeSingle();
 
         if (findError) throw findError;
-        if (!room) throw new Error('Sala não encontrada! Verifique o código.');
-        if (room.player1_id === user.id) {
+        if (!room) {
+            alert("Sala não encontrada! Verifique o código. 🔍");
+            return;
+        }
+        if (room.player1_id === user.id && room.player2_id !== null) {
             setGame(room);
             return room;
         }
+
+        // If same user joins their own room (second tab), we allow it for testing
+        // by updating the record anyway, but UI might be tricky.
+        // Better: just continue to update player2_id if it's null.
 
         // 2. Join the room
         const { data: joined, error: joinError } = await supabase
