@@ -830,7 +830,6 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
               key={i}
               className={`face-card-meta ${eliminated ? 'eliminated' : ''} ${suggestion === 'eliminate' ? 'suggest-red' : suggestion === 'keep' ? 'suggest-green' : ''} ${isChoosingGuess ? 'pulse' : ''}`}
               onClick={() => toggleEliminate(char.name)}
-              style={{ height: '100px' }}
             >
               <div className="face-avatar">
                 <img src={getAvatarUrl(char.avatar)} alt={char.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
