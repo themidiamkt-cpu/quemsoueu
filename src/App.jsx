@@ -308,6 +308,20 @@ export default function App() {
               <p style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 700 }}>Encontre os pares de personagens!</p>
             </div>
           </button>
+
+          <button
+            onClick={() => setSelectedGameType('cara-a-cara')}
+            className="white-card"
+            style={{ textAlign: 'left', display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer' }}
+          >
+            <div style={{ width: '48px', height: '48px', background: 'var(--mint-light)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--mint)' }}>
+              <Users size={28} />
+            </div>
+            <div>
+              <h3 style={{ fontWeight: 900, fontSize: '1.1rem' }}>Cara a Cara</h3>
+              <p style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 700 }}>Adivinhe quem é o outro!</p>
+            </div>
+          </button>
         </div>
 
         <div style={{ marginTop: '32px' }}>
@@ -511,18 +525,301 @@ export default function App() {
         {!game && (
           !selectedGameType ? renderGameSelection() : renderLobby()
         )}
-
         {game?.status === 'setup' && (
-          game.game_type === 'memory' ? <MemoryGameSetup game={game} user={user} exitRoom={exitRoom} /> : renderSetup()
+          game.game_type === 'memory' ? <MemoryGameSetup game={game} user={user} exitRoom={exitRoom} /> :
+            game.game_type === 'cara-a-cara' ? <CaraACaraSetup game={game} user={user} exitRoom={exitRoom} /> :
+              renderSetup()
         )}
 
         {game?.status === 'playing' && (
-          game.game_type === 'memory' ? <MemoryGame game={game} user={user} exitRoom={exitRoom} /> : renderPlaying()
+          game.game_type === 'memory' ? <MemoryGame game={game} user={user} exitRoom={exitRoom} /> :
+            game.game_type === 'cara-a-cara' ? <CaraACaraGame game={game} user={user} exitRoom={exitRoom} /> :
+              renderPlaying()
         )}
       </motion.div>
     </AnimatePresence>
   );
 }
+
+// --- CARA A CARA COMPONENTS ---
+
+const CaraACaraSetup = ({ game, user, exitRoom }) => {
+  const { updateGame } = useGame();
+  const [selectedCategory, setSelectedCategory] = useState('kids');
+
+  const handleStart = async () => {
+    try {
+      const pool = characterBank[selectedCategory] || characterBank['kids'];
+      const shuffled = [...pool].sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 12);
+
+      const p1Secret = selected[Math.floor(Math.random() * selected.length)];
+      const p2Secret = selected[Math.floor(Math.random() * selected.length)];
+
+      await updateGame(game.id, {
+        status: 'playing',
+        board_state: {
+          characters: selected,
+          p1_secret: p1Secret,
+          p2_secret: p2Secret,
+          p1_eliminated: [],
+          p2_eliminated: [],
+          p1_question: null,
+          p2_question: null,
+          waiting_for_answer: false
+        },
+        current_turn: 'p1'
+      });
+    } catch (err) {
+      console.error("Erro ao iniciar jogo:", err);
+      alert("Erro ao iniciar o jogo! ❌");
+    }
+  };
+
+  return (
+    <div className="child-container">
+      <div className="white-card shadow-lg" style={{ maxWidth: '400px', textAlign: 'center' }}>
+        <div style={{ fontSize: '5rem', marginBottom: '10px' }}>🎭</div>
+        <h2 className="text-hero" style={{ fontSize: '2rem' }}>CARA A CARA</h2>
+        <p className="text-sub">Adivinhe o personagem do seu amigo!</p>
+
+        {!game.player2_id ? (
+          <div style={{ marginTop: '20px' }}>
+            <div className="room-code-box" onClick={() => navigator.clipboard.writeText(game.room_code)}>
+              <span style={{ fontSize: '0.6rem', opacity: 0.4, display: 'block', fontWeight: 900 }}>CÓDIGO DA SALA</span>
+              <span className="text-hero" style={{ color: 'var(--primary)', letterSpacing: '6px', fontSize: '3rem' }}>{game.room_code}</span>
+              <span className="copy-hint text-primary">COPIAR 📋</span>
+            </div>
+            <p className="text-sub">Aguardando seu amigo entrar...</p>
+            <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.75rem', marginTop: '16px' }}>CANCELAR SALA 🚪</button>
+          </div>
+        ) : (
+          <div style={{ marginTop: '20px' }}>
+            <div style={{
+              background: '#f0fdf4',
+              color: '#16a34a',
+              padding: '12px 24px',
+              borderRadius: '20px',
+              fontWeight: 900,
+              fontSize: '0.8rem',
+              border: '2px solid #dcfce7',
+              marginBottom: '24px'
+            }}>
+              AMIGO CONECTADO! ✅
+            </div>
+
+            {game.player1_id === user.id ? (
+              <div style={{ marginTop: '24px' }}>
+                <p style={{ fontSize: '0.8rem', fontWeight: 900, marginBottom: '12px', opacity: 0.5 }}>ESCOLHA A CATEGORIA:</p>
+                <div className="category-row" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+                  {categories.map(cat => (
+                    <button key={cat.id} onClick={() => setSelectedCategory(cat.id)} className={`cat-btn ${selectedCategory === cat.id ? 'active' : ''}`}>
+                      <span style={{ fontSize: '1.2rem', display: 'block' }}>{cat.name.split(' ')[0]}</span>
+                      <span style={{ fontSize: '0.6rem', fontWeight: 900 }}>{cat.name.split(' ')[1]}</span>
+                    </button>
+                  ))}
+                </div>
+                <button onClick={handleStart} className="btn-puffy btn-green">
+                  COMEÇAR AGORA! 🚀
+                </button>
+              </div>
+            ) : (
+              <div style={{ padding: '30px 0' }}>
+                <div style={{ width: '40px', height: '40px', border: '5px solid #f1f5f9', borderTopColor: 'var(--primary)', borderRadius: '50%', margin: '0 auto 15px' }} className="animate-spin"></div>
+                <p className="text-sub">O MESTRE ESTÁ PREPARANDO...</p>
+              </div>
+            )}
+            <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.875rem', marginTop: '16px', background: 'transparent', boxShadow: 'none', color: '#94a3b8' }}>SAIR DA SALA</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const CaraACaraGame = ({ game, user, exitRoom }) => {
+  const { updateGame } = useGame();
+  const isP1 = game.player1_id === user.id;
+  const myTurn = (game.current_turn === 'p1' && isP1) || (game.current_turn === 'p2' && !isP1);
+  const mySecret = isP1 ? game.board_state?.p1_secret : game.board_state?.p2_secret;
+  const board = game.board_state?.characters || [];
+  const myEliminations = isP1 ? (game.board_state?.p1_eliminated || []) : (game.board_state?.p2_eliminated || []);
+  const waitingForAnswer = game.board_state?.waiting_for_answer;
+  const currentQuestion = isP1 ? game.board_state?.p2_question : game.board_state?.p1_question;
+
+  const [freeQuestion, setFreeQuestion] = useState('');
+  const [isChoosingGuess, setIsChoosingGuess] = useState(false);
+
+  const toggleEliminate = (name) => {
+    if (isChoosingGuess) {
+      handleGuess(name);
+      return;
+    }
+    const newList = myEliminations.includes(name)
+      ? myEliminations.filter(n => n !== name)
+      : [...myEliminations, name];
+
+    const key = isP1 ? 'p1_eliminated' : 'p2_eliminated';
+    updateGame(game.id, {
+      board_state: {
+        ...game.board_state,
+        [key]: newList
+      }
+    });
+  };
+
+  const handleAsk = async (question) => {
+    if (!myTurn || waitingForAnswer || !question.trim()) return;
+    const key = isP1 ? 'p1_question' : 'p2_question';
+    await updateGame(game.id, {
+      board_state: {
+        ...game.board_state,
+        [key]: question.trim(),
+        waiting_for_answer: true
+      }
+    });
+    setFreeQuestion('');
+  };
+
+  const handleAnswer = async (answer) => {
+    if (myTurn || !waitingForAnswer) return;
+    await updateGame(game.id, {
+      current_turn: game.current_turn === 'p1' ? 'p2' : 'p1',
+      board_state: {
+        ...game.board_state,
+        p1_question: null,
+        p2_question: null,
+        waiting_for_answer: false
+      }
+    });
+  };
+
+  const handleGuess = async (name) => {
+    const opponentSecret = isP1 ? game.board_state?.p2_secret : game.board_state?.p1_secret;
+    if (name === opponentSecret) {
+      confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+      alert(`🎉 PARABÉNS! Você acertou! O personagem era ${name}!`);
+      const newScores = { ...game.scores };
+      newScores[isP1 ? 'p1' : 'p2'] += 1;
+      await updateGame(game.id, {
+        status: 'setup',
+        scores: newScores,
+        board_state: {}
+      });
+    } else {
+      alert(`❌ QUE PENA! Não era o ${name}. Perdeu a vez!`);
+      // Optionally penalize by skipping turn correctly
+      setIsChoosingGuess(false);
+      await updateGame(game.id, {
+        current_turn: game.current_turn === 'p1' ? 'p2' : 'p1',
+        board_state: {
+          ...game.board_state,
+          waiting_for_answer: false
+        }
+      });
+    }
+  };
+
+  return (
+    <div className="child-container">
+      <ScoreBoard game={game} isP1={isP1} p1Ready={true} p2Ready={true} />
+
+      <div className="secret-card-mini" style={{ width: '100%', maxWidth: '500px' }}>
+        <div style={{ fontSize: '1.5rem' }}>㊙️</div>
+        <div>
+          <p className="secret-label">SEU PERSONAGEM SECRETO:</p>
+          <p className="secret-name">{mySecret}</p>
+        </div>
+      </div>
+
+      <div className={`turn-badge ${myTurn ? 'active' : 'waiting'}`} style={{ marginBottom: '8px' }}>
+        {myTurn ? '👉 SEU TURNO! PERGUNTE 👀' : '⌛ ESPERE O AMIGO...'}
+      </div>
+
+      {waitingForAnswer && (
+        <div className="answer-box" style={{ maxWidth: '500px' }}>
+          {myTurn ? (
+            <p className="text-sub">VOCÊ PERGUNTOU: <br /><strong style={{ color: 'var(--primary)', fontSize: '1.1rem' }}>{isP1 ? game.board_state.p1_question : game.board_state.p2_question}</strong><br />Aguardando resposta...</p>
+          ) : (
+            <div>
+              <p className="text-sub">ELE PERGUNTOU: <br /><strong style={{ color: 'var(--secondary)', fontSize: '1.1rem' }}>{currentQuestion}</strong></p>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                <button onClick={() => handleAnswer(true)} className="btn-puffy btn-green" style={{ flex: 1, padding: '10px' }}>SIM ✅</button>
+                <button onClick={() => handleAnswer(false)} className="btn-puffy btn-rose" style={{ flex: 1, padding: '10px' }}>NÃO ❌</button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {isChoosingGuess && (
+        <div style={{ background: 'var(--accent)', color: 'white', padding: '8px 20px', borderRadius: '100px', fontWeight: 900, fontSize: '0.7rem', marginBottom: '8px' }} className="animate-pulse">
+          👉 TOQUE NO PERSONAGEM QUE VOCÊ ACHA QUE É!
+        </div>
+      )}
+
+      <div className="face-grid">
+        {board.map((name, i) => (
+          <div
+            key={i}
+            className={`face-card ${myEliminations.includes(name) ? 'eliminated' : ''} ${isChoosingGuess ? 'pulse' : ''}`}
+            onClick={() => toggleEliminate(name)}
+          >
+            <span className="face-card-emoji">🎭</span>
+            <span className="face-card-name">{name}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="question-panel">
+        {myTurn && !waitingForAnswer && !isChoosingGuess && (
+          <>
+            <div className="btn-group">
+              <button onClick={() => handleAsk('🐶 É animal?')} className="quick-btn">🐶 É animal?</button>
+              <button onClick={() => handleAsk('🍕 É comida?')} className="quick-btn">🍕 É comida?</button>
+              <button onClick={() => handleAsk('🏠 É objeto?')} className="quick-btn">🏠 É objeto?</button>
+              <button onClick={() => handleAsk('🎭 É personagem?')} className="quick-btn">🎭 É personagem?</button>
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                type="text"
+                className="input-child"
+                placeholder="Ou faça uma pergunta livre..."
+                style={{ fontSize: '0.75rem', height: '44px' }}
+                value={freeQuestion}
+                onChange={e => setFreeQuestion(e.target.value)}
+                onKeyPress={e => e.key === 'Enter' && handleAsk(freeQuestion)}
+              />
+              <button onClick={() => handleAsk(freeQuestion)} className="btn-puffy btn-blue" style={{ width: '60px', height: '44px' }}>🚀</button>
+            </div>
+          </>
+        )}
+
+        {isChoosingGuess ? (
+          <button className="btn-puffy btn-light" onClick={() => setIsChoosingGuess(false)}>CANCELAR PALPITE ↩️</button>
+        ) : (
+          <button
+            className="btn-puffy btn-purple"
+            disabled={!myTurn || waitingForAnswer}
+            style={{ opacity: (!myTurn || waitingForAnswer) ? 0.5 : 1 }}
+            onClick={() => setIsChoosingGuess(true)}
+          >
+            👉 ACHO QUE É...
+          </button>
+        )}
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
+          <button onClick={() => {
+            const key = isP1 ? 'p1_eliminated' : 'p2_eliminated';
+            updateGame(game.id, { board_state: { ...game.board_state, [key]: [] } });
+          }} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#94a3b8' }}>RESETAR CARDS 🔄</button>
+          <button onClick={exitRoom} className="btn-puffy btn-light" style={{ fontSize: '0.6rem', color: '#f43f5e' }}>SAIR DO JOGO 🚪</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 // --- MEMORY GAME COMPONENTS ---
 
