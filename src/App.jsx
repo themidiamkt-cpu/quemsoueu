@@ -777,8 +777,14 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
   // Helper to get Twemoji SVG URL for an emoji
   const getAvatarUrl = (emoji) => {
     if (!emoji || emoji.startsWith('http')) return emoji;
-    const codes = [...emoji].map(c => c.codePointAt(0).toString(16)).filter(c => c !== 'fe0f').join('-');
-    return `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${codes}.svg`;
+    const codepoints = [];
+    for (const char of emoji) {
+      const cp = char.codePointAt(0);
+      if (cp !== 0xfe0f) { // skip variation selector
+        codepoints.push(cp.toString(16));
+      }
+    }
+    return `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${codepoints.join('-')}.svg`;
   };
 
   return (
@@ -832,9 +838,13 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
               onClick={() => toggleEliminate(char.name)}
             >
               <div className="face-avatar">
-                <img src={getAvatarUrl(char.avatar)} alt={char.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                <img
+                  src={getAvatarUrl(char.avatar)}
+                  alt={char.name}
+                  onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = `<span style="font-size:2rem">${char.avatar || '❓'}</span>`; }}
+                />
               </div>
-              <div className="face-name" style={{ fontSize: '0.55rem' }}>{char.name}</div>
+              <div className="face-name">{char.name}</div>
               {suggestion === 'eliminate' && !eliminated && <div className="suggestion-badge">×</div>}
             </div>
           );
