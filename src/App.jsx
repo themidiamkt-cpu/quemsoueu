@@ -58,25 +58,30 @@ const PlayerAvatar = ({ name, colorIndex = 0, isActive }) => {
     'linear-gradient(135deg, #10b981 0%, #059669 100%)'
   ];
   const initial = (name || '?').charAt(0).toUpperCase();
-  const bgGradient = gradients[colorIndex % gradients.length];
+  const colors = ['#fb7185', '#38bdf8', '#8b5cf6', '#fbbf24', '#10b981'];
 
   return (
-    <div
-      className={`avatar ${isActive ? 'active' : ''}`}
-      style={{
-        background: bgGradient,
-        width: '40px',
-        height: '40px',
-        borderRadius: '16px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        border: '2px solid white',
-        boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-        flexShrink: 0
-      }}
-    >
-      <span style={{ color: 'white', fontWeight: 900, fontSize: '0.8rem' }}>{initial}</span>
+    <div style={{
+      width: '40px',
+      height: '40px',
+      borderRadius: '50%',
+      background: isActive ? colors[colorIndex] : '#e2e8f0',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontWeight: 'bold',
+      color: 'white',
+      boxShadow: isActive ? `0 0 15px ${colors[colorIndex]}44` : 'none',
+      transition: 'all 0.3s ease',
+      border: isActive ? '2.5px solid white' : '2.5px solid transparent',
+      flexShrink: 0,
+      overflow: 'hidden'
+    }}>
+      {name ? (
+        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${name}&backgroundColor=transparent`} alt={name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+      ) : (
+        <div style={{ fontSize: '1.25rem' }}>?</div>
+      )}
     </div>
   );
 };
@@ -767,7 +772,9 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
       <ScoreBoard game={game} isP1={isP1} p1Ready={true} p2Ready={true} />
 
       <div className="secret-card-meta">
-        <div style={{ fontSize: '2rem' }}>{mySecret?.avatar}</div>
+        <div style={{ width: '48px', height: '48px', borderRadius: '12px', overflow: 'hidden', background: '#f8fafc' }}>
+          <img src={mySecret?.avatar} alt={mySecret?.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        </div>
         <div>
           <p className="secret-label">SEU PERSONAGEM SECRETO:</p>
           <p className="secret-name">{mySecret?.name}</p>
@@ -823,7 +830,9 @@ const CaraACaraGame = ({ game, user, exitRoom }) => {
               className={`face-card-meta ${eliminated ? 'eliminated' : ''} ${suggestion === 'eliminate' ? 'suggest-red' : suggestion === 'keep' ? 'suggest-green' : ''} ${isChoosingGuess ? 'pulse' : ''}`}
               onClick={() => toggleEliminate(char.name)}
             >
-              <div className="face-avatar">{char.avatar}</div>
+              <div className="face-avatar" style={{ overflow: 'hidden', background: '#f8fafc', borderRadius: '12px' }}>
+                <img src={char.avatar} alt={char.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              </div>
               <div className="face-name">{char.name}</div>
               {suggestion === 'eliminate' && !eliminated && <div className="suggestion-badge">❌</div>}
               {suggestion === 'keep' && !eliminated && <div className="suggestion-badge-keep">✅</div>}
